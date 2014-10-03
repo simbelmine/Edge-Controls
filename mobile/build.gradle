@@ -1,0 +1,41 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 20
+    buildToolsVersion "19.1.0"
+
+    defaultConfig {
+        applicationId "com.example.sve.edgecontrols"
+        minSdkVersion 19
+        targetSdkVersion 20
+        versionCode 1
+        versionName "1.0"
+    }
+
+//    signingConfigs {
+//        release {
+//            Properties props = new Properties()
+//            props.load(new FileInputStream(project.rootProject.file("signing.properties")))
+//            storeFile file("${props.get("signing.storeFile")}")
+//            storePassword "${props.get("signing.storePass")}"
+//            keyAlias "${props.get("signing.storeAlias")}"
+//            keyPassword "${props.get("signing.storePass")}"
+//        }
+//    }
+
+    buildTypes {
+        release {
+            runProguard false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+//            signingConfig signingConfigs.release
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.google.android.gms:play-services:+'
+    compile 'com.android.support:support-v4:20.0.+'
+    compile project (':common')
+    wearApp project(':wear')
+}

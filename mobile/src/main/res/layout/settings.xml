@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="300dip"
+        android:layout_centerInParent="true">
+        <ImageView
+            android:id ="@+id/settings_img"
+            android:layout_width="300dip"
+            android:layout_height="300dip"
+            android:layout_centerInParent="true"
+            android:layout_marginLeft="10dip"
+            android:layout_marginRight="10dip"
+            android:src="@drawable/empty_screen"/>
+        <View
+            android:id="@+id/up_left_corner"
+            android:layout_width="25dip"
+            android:layout_height="40dip"
+            android:layout_alignLeft="@id/settings_img"
+            android:layout_marginTop="20dip"
+            android:layout_marginLeft="13dip"
+            android:background="@color/light_blue_transparent"/>
+        <View
+            android:id="@+id/middle_left"
+            android:layout_width="25dip"
+            android:layout_height="140dip"
+            android:layout_alignLeft="@id/settings_img"
+            android:layout_marginTop="14dip"
+            android:layout_marginLeft="13dip"
+            android:layout_centerVertical="true"
+            android:background="@color/light_blue_transparent"/>
+
+        <View
+            android:id="@+id/down_left_corner"
+            android:layout_width="25dip"
+            android:layout_height="40dip"
+            android:layout_alignLeft="@id/settings_img"
+            android:layout_marginBottom="20dip"
+            android:layout_marginLeft="13dip"
+            android:layout_alignBottom="@id/settings_img"
+            android:background="@color/light_blue_transparent"/>
+
+        <View
+            android:id="@+id/middle_right"
+            android:layout_width="25dip"
+            android:layout_height="260dip"
+            android:layout_alignRight="@id/settings_img"
+            android:layout_marginTop="20dip"
+            android:layout_marginRight="13dip"
+            android:background="@color/light_blue"
+            />
+    </RelativeLayout>
+
+
+</RelativeLayout>
