@@ -1,5 +1,6 @@
 <resources>
-    <string name="app_name">Edge Controls: Brightness</string>
+    <string name="app_name"><font size='17' face="sans-serif-light"><b>Wear Edge Controls: Brightness</b></font></string>
+    <!--<string name="app_name">Wear Edge Controls: Brightness</string>-->
     <string name="main_text">Click <font size='20' fgcolor='teal'><b>Start</b></font> and the application is ready to be used on your wear device!</string>
     <string name="no_devie_connected">No device connected. Please connect your Wear or open the wear app using the Start menu.</string>
     <string name="transparent_msg"><font size='20' fgcolor='teal'><b><u>NB</u></b></font>: The line(s) in the application is(are) transparent. You just need to swipe up-down to change the brightness level.</string>

@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.example.sve.module.Variables;
 import com.google.android.gms.common.ConnectionResult;
@@ -44,6 +45,13 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        final TextView title = (TextView) findViewById(android.R.id.title);
+        if (title != null) {
+            title.setPadding(10, 0, 0, 0);
+            title.setCompoundDrawablePadding(10);
+            title.setCompoundDrawablesWithIntrinsicBounds(R.drawable.logo, 0, 0, 0);
+        }
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(Wearable.API)
