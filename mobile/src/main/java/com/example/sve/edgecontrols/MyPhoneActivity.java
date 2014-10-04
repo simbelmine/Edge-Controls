@@ -3,6 +3,7 @@ package com.example.sve.edgecontrols;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -35,7 +36,7 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
     private int numWearables;
     private String nodeId;
 
-    private static boolean isStarted = false;
+//    private static boolean isStarted = false;
     private static boolean isStopEnabled = false;
     private SharedPreferences sharedPreferences;
 
@@ -51,15 +52,12 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
                 .build();
 
         sharedPreferences = getSharedPreferences("MyMobilePrefs", 0);
-        boolean new_isStarted = sharedPreferences.getBoolean("isStarted", isStarted);
+//        boolean new_isStarted = sharedPreferences.getBoolean("isStarted", isStarted);
         boolean isStopEnabled_new = sharedPreferences.getBoolean("isStopEnabled", isStopEnabled);
-        isStarted = new_isStarted;
+//        isStarted = new_isStarted;
         isStopEnabled = isStopEnabled_new;
 
         Log.v(tag, "main activity on create");
-
-//         onWearableConnected();
-
     }
 
     @Override
@@ -96,7 +94,7 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
 
         sharedPreferences = getSharedPreferences("MyMobilePrefs", 0);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean("isStarted", isStarted);
+//        editor.putBoolean("isStarted", isStarted);
         editor.putBoolean("isStopEnabled", isStopEnabled);
         editor.commit();
 
@@ -152,10 +150,14 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
 
         if (!isStopEnabled) {
             start.setEnabled(true);
+            start.setBackground(getResources().getDrawable(R.drawable.button_style_up));
             stop.setEnabled(false);
+            stop.setTextColor(Color.parseColor("#888888"));
         } else {
             start.setEnabled(false);
+            start.setTextColor(Color.parseColor("#888888"));
             stop.setEnabled(true);
+            stop.setBackground(getResources().getDrawable(R.drawable.button_style_up));
         }
 
         start.setOnClickListener(new View.OnClickListener() {
@@ -209,7 +211,7 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
                     }
                     else {
                         Log.e("TAG", "Failed to send the Message: " + variable);
-                        isStarted = false;
+//                        isStarted = false;
                         isStopEnabled = true;
                     }
 
