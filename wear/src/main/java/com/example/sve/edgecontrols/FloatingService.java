@@ -129,7 +129,7 @@ public class FloatingService extends Service {
         upLeft_params.x = 0;
         upLeft_params.y = 0;
         upLeft_params.width = 25;
-        upLeft_params.height = getDisplayHeight(windowManager)/6;
+        upLeft_params.height = getDisplayHeight(windowManager)/4;
 
         final GestureDetector myUpLeftGesture = new GestureDetector(this,
                 new BrightnessGestureListener(this, windowManager, brightness, upLeftCornerView));
@@ -164,7 +164,7 @@ public class FloatingService extends Service {
         downLeft_params.x = 0;
         downLeft_params.y = 0;
         downLeft_params.width = 25;
-        downLeft_params.height = getDisplayHeight(windowManager)/6;
+        downLeft_params.height = getDisplayHeight(windowManager)/4;
 
         final GestureDetector myDownLeftGesture = new GestureDetector(this,
                 new BrightnessGestureListener(this, windowManager, brightness, downLeftCornerView));
