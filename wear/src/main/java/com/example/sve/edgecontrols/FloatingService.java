@@ -27,9 +27,9 @@ import java.util.Set;
  */
 public class FloatingService extends Service {
     private WindowManager windowManager;
-    private CustomView leftView;
     private CustomView rightView;
     private CustomView upLeftCornerView;
+    private CustomView middleLeftView;
     private CustomView downLeftCornerView;
     private TextView tv;
 
@@ -42,9 +42,10 @@ public class FloatingService extends Service {
     private float brightness = 0;
 
     private Set<String> edgesStatusSet;
-    private String edgeStatus;
+    private String edgeVisibilityParam;
     private SharedPreferences localSharedPrefs;
     private Context context;
+    private String tag = "edge.brightness.floating";
 
 
     @Override
@@ -60,6 +61,150 @@ public class FloatingService extends Service {
         localSharedPrefs = context.getSharedPreferences("MyLocalPrefs", 0);
 
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
+
+        initializeViews();
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        SharedPreferences sharedPreferences = getSharedPreferences("MyWearPrefs", 0);
+        edgesStatusSet = sharedPreferences.getStringSet("edgeStatusList", null);
+
+        if (edgesStatusSet != null) {
+            edgeVisibilityParam = getStatusFromExtras(intent);
+        }
+
+        Log.e("TAG", "******** Edge status = " + edgeVisibilityParam);
+//        Log.e("TAG", "************** SHARED PREFS = " + String.valueOf(localSharedPrefs.getInt("upLeft",11)) + "  " +
+//                String.valueOf(localSharedPrefs.getInt("middLeft",11)) + "  " +
+//                String.valueOf(localSharedPrefs.getInt("downLeft",11)) + "  " +
+//                String.valueOf(localSharedPrefs.getInt("right",11)));
+        if(edgeVisibilityParam != null) {
+            setEdgeVisibility();
+            updateViewsVisibilities();
+        }
+        else {
+            updateViewsVisibilities();
+        }
+
+        windowManager.addView(tv, paramsTextView);
+        windowManager.addView(middleLeftView, left_params);
+        windowManager.addView(upLeftCornerView, upLeft_params);
+        windowManager.addView(downLeftCornerView, downLeft_params);
+        windowManager.addView(rightView, right_params);
+
+        return Service.START_NOT_STICKY;
+    }
+
+    private String getStatusFromExtras(Intent intent) {
+        for(String status : edgesStatusSet) {
+            if(intent.hasExtra(status)){
+                return status;
+            }
+        }
+        return null;
+    }
+
+    private void updateViewsVisibilities() {
+        //localSharedPrefs = context.getSharedPreferences("MyLocalPrefs", 0);
+        Log.e("TAG", "************** INITIAL ***************");
+
+        boolean upLeft = localSharedPrefs.getBoolean("upLeft", false);
+        boolean middleLeft= localSharedPrefs.getBoolean("middleLeft", false);
+        boolean downLeft= localSharedPrefs.getBoolean("downLeft", false);
+        boolean right = localSharedPrefs.getBoolean("right", true);
+
+        changeViewVisibility(upLeft, upLeftCornerView);
+        changeViewVisibility(middleLeft, middleLeftView);
+        changeViewVisibility(downLeft, downLeftCornerView);
+        changeViewVisibility(right, rightView);
+
+//        Log.e("TAG", "------------- shared preferences = " + String.valueOf(localSharedPrefs.getInt("upLeft",11)) + "  " +
+//                String.valueOf(localSharedPrefs.getInt("middLeft",11)) + "  " +
+//                String.valueOf(localSharedPrefs.getInt("downLeft",11)) + "  " +
+//                String.valueOf(localSharedPrefs.getInt("right",11)));
+    }
+
+    private void changeViewVisibility(boolean active, CustomView view) {
+        if (active) {
+            view.setVisibility(View.VISIBLE);
+        } else {
+            view.setVisibility(View.GONE);
+        }
+    }
+
+    private void saveUpLeft(boolean active) {
+        save("upLeft", active);
+    }
+    private void saveMiddleLeft(boolean active) {
+        save("middleLeft", active);
+    }
+    private void saveDownLeft(boolean active) {
+        save("downLeft", active);
+    }
+    private void saveRight(boolean active) {
+        save("right", active);
+    }
+
+    private void save(String controlName, boolean active) {
+        localSharedPrefs = context.getSharedPreferences("MyLocalPrefs", 0);
+        SharedPreferences.Editor editor = localSharedPrefs.edit();
+        editor.putBoolean(controlName, active);
+        editor.commit();
+    }
+
+    private void setEdgeVisibility() {
+        // ***** Switch-Case it's not working for Strings *****//
+
+        // Up - Left
+        if (Variables.UPLEFTVISIBLE.equals(edgeVisibilityParam)) {
+            saveUpLeft(true);
+        } else if (edgeVisibilityParam.equals(Variables.UPLEFTGONE)) {
+            saveUpLeft(false);
+        } else if (edgeVisibilityParam.equals(Variables.MIDDLELEFTVISIBLE)) {
+            saveMiddleLeft(true);
+        } else if (edgeVisibilityParam.equals(Variables.MIDDLELEFTGONE)) {
+            saveMiddleLeft(false);
+        } else if (edgeVisibilityParam.equals(Variables.DOWNLEFTVISIBLE)) {
+            saveDownLeft(true);
+        } else if (edgeVisibilityParam.equals(Variables.DOWNLEFTGONE)) {
+            saveDownLeft(false);
+        } else if (edgeVisibilityParam.equals(Variables.RIGHTVISIBLE)) {
+            saveRight(true);
+        } else if (edgeVisibilityParam.equals(Variables.RIGHTGONE)) {
+            saveRight(false);
+        }
+//        Log.e("TAG", "------------- shared preferences = " + localSharedPrefs.getBoolean("upLeft", 11) + "  " +
+//                String.valueOf(localSharedPrefs.getInt("middLeft", 11)) + "  " +
+//                String.valueOf(localSharedPrefs.getInt("downLeft", 11)) + "  " +
+//                String.valueOf(localSharedPrefs.getInt("right", 11)));
+
+        updateViewsVisibilities();
+    }
+
+    private int getDisplayHeight(WindowManager windowManager) {
+        Display display = windowManager.getDefaultDisplay();
+        Point display_size = new Point();
+        display.getSize(display_size);
+
+        return display_size.y;
+    }
+
+    @Override
+    public void onDestroy() {
+
+        if(tv != null) windowManager.removeViewImmediate(tv);
+        if(middleLeftView != null) windowManager.removeViewImmediate(middleLeftView);
+        if(upLeftCornerView != null) windowManager.removeViewImmediate(upLeftCornerView);
+        if(downLeftCornerView != null) windowManager.removeViewImmediate(downLeftCornerView);
+        if(rightView != null) windowManager.removeViewImmediate(rightView);
+
+        //Toast.makeText(this, "Destroy ...", Toast.LENGTH_LONG).show();
+        stopSelf();
+        super.onDestroy();
+    }
+
+    private void initializeViews() {
 
         ////////// *** Middle Text View *** //////////
         tv = new TextView(this);
@@ -79,8 +224,8 @@ public class FloatingService extends Service {
         //////////////////////////////////////////////
         ////////// *** Left Middle View *** //////////
         //////////////////////////////////////////////
-        leftView = new CustomView(this, tv);
-        leftView.setBackgroundColor(getResources().getColor(R.color.light_blue));
+        middleLeftView = new CustomView(this, tv);
+        middleLeftView.setBackgroundColor(getResources().getColor(R.color.light_blue));
         left_params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT,
@@ -97,18 +242,18 @@ public class FloatingService extends Service {
         left_params.height = getDisplayHeight(windowManager)/2; // WHOLE SCREEEN (if HALF divide by 2)
 
         final GestureDetector myGesture = new GestureDetector(this,
-                new BrightnessGestureListener(this, windowManager, brightness, leftView));
-        leftView.setOnTouchListener(new View.OnTouchListener() {
+                new BrightnessGestureListener(this, windowManager, brightness, middleLeftView));
+        middleLeftView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if(event.getActionMasked() == MotionEvent.ACTION_DOWN)
+                if (event.getActionMasked() == MotionEvent.ACTION_DOWN)
                     tv.setVisibility(View.VISIBLE);
-                else if(event.getActionMasked() == MotionEvent.ACTION_UP)
+                else if (event.getActionMasked() == MotionEvent.ACTION_UP)
                     tv.setVisibility(View.GONE);
                 return myGesture.onTouchEvent(event);
             }
         });
-        leftView.setClickable(true);
+        middleLeftView.setClickable(true);
 
 
         //////////////////////////////////////////////
@@ -214,214 +359,5 @@ public class FloatingService extends Service {
             }
         });
         rightView.setClickable(true);
-
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        SharedPreferences sharedPreferences = getSharedPreferences("MyWearPrefs", 0);
-        edgesStatusSet = sharedPreferences.getStringSet("edgeStatusList", null);
-
-        if(edgesStatusSet != null) {
-            edgeStatus = getStatusFromExtras(intent);
-        }
-
-        Log.e("TAG", "******** Edge status = " + edgeStatus);
-        Log.e("TAG", "************** SHARED PREFS = " + String.valueOf(localSharedPrefs.getInt("upLeft",11)) + "  " +
-                String.valueOf(localSharedPrefs.getInt("middLeft",11)) + "  " +
-                String.valueOf(localSharedPrefs.getInt("downLeft",11)) + "  " +
-                String.valueOf(localSharedPrefs.getInt("right",11)));
-        if(edgeStatus != null) {
-            setEdgeVisibility();
-            setInitialVisability();
-        }
-        else {
-            setInitialVisability();
-        }
-
-
-        windowManager.addView(tv, paramsTextView);
-        windowManager.addView(leftView, left_params);
-        windowManager.addView(upLeftCornerView, upLeft_params);
-        windowManager.addView(downLeftCornerView, downLeft_params);
-        windowManager.addView(rightView, right_params);
-
-
-
-        return Service.START_NOT_STICKY;
-    }
-
-    private String getStatusFromExtras(Intent intent) {
-        for(String status : edgesStatusSet) {
-            if(intent.hasExtra(status)){
-                return status;
-            }
-        }
-        return null;
-    }
-
-    private void setInitialVisability() {
-        //localSharedPrefs = context.getSharedPreferences("MyLocalPrefs", 0);
-        Log.e("TAG", "************** INITIAL ***************");
-
-        //------ UP - LEFT
-        if(localSharedPrefs.getInt("upLeft", 11) != 11) {
-            if(localSharedPrefs.getInt("upLeft", 11) == View.VISIBLE) {
-                upLeftCornerView.setVisibility(View.VISIBLE);
-            }
-            else {
-                upLeftCornerView.setVisibility(View.GONE);
-            }
-        }
-        else {
-            upLeftCornerView.setVisibility(View.GONE);
-            Log.e("TAG", "------ UP INIT ----");
-        }
-
-        //------ MIDDLE - LEFT
-        if(localSharedPrefs.getInt("middLeft", 11) != 11) {
-            if(localSharedPrefs.getInt("middLeft", 11) == View.VISIBLE) {
-                leftView.setVisibility(View.VISIBLE);
-                Log.e("TAG", "------ MIDDLE visible into Init method ----");
-            }
-            else {
-                leftView.setVisibility(View.GONE);
-            }
-        }
-        else {
-            leftView.setVisibility(View.GONE);
-            Log.e("TAG", "------ MIDDLE INIT ----");
-        }
-
-        //----- DOWN - LEFT
-        if(localSharedPrefs.getInt("downLeft", 11) != 11) {
-            if(localSharedPrefs.getInt("downLeft", 11) == View.VISIBLE) {
-                downLeftCornerView.setVisibility(View.VISIBLE);
-            }
-            else {
-                downLeftCornerView.setVisibility(View.GONE);
-            }
-        }
-        else {
-            downLeftCornerView.setVisibility(View.GONE);
-            Log.e("TAG", "------ DOWN INIT ----");
-        }
-
-        //---- RIGHT
-        if(localSharedPrefs.getInt("right", 11) != 11) {
-            if(localSharedPrefs.getInt("right", 11) == View.VISIBLE) {
-                rightView.setVisibility(View.VISIBLE);
-                Log.e("TAG", "------ RIGHT VISIBLE ----");
-            }
-            else {
-                rightView.setVisibility(View.GONE);
-                Log.e("TAG", "------ RIGHT GONE ----");
-            }
-        }
-        else {
-            rightView.setVisibility(View.VISIBLE);
-            Log.e("TAG", "------ RIGHT INIT ----");
-        }
-
-
-        putInSharedPreferences(upLeftCornerView.getVisibility(), leftView.getVisibility(),
-                downLeftCornerView.getVisibility(), rightView.getVisibility());
-
-        Log.e("TAG", "------------- shared preferences = " + String.valueOf(localSharedPrefs.getInt("upLeft",11)) + "  " +
-                String.valueOf(localSharedPrefs.getInt("middLeft",11)) + "  " +
-                String.valueOf(localSharedPrefs.getInt("downLeft",11)) + "  " +
-                String.valueOf(localSharedPrefs.getInt("right",11)));
-
-    }
-
-
-    private void putInSharedPreferences(int upLeft, int middLeft, int downLeft, int right) {
-        localSharedPrefs = context.getSharedPreferences("MyLocalPrefs", 0);
-        SharedPreferences.Editor editor = localSharedPrefs.edit();
-        if(upLeft== 0 || upLeft == 8) editor.putInt("upLeft", upLeft);
-        if(middLeft== 0 || middLeft == 8) editor.putInt("middLeft", middLeft);
-        if(downLeft== 0 || downLeft == 8) editor.putInt("downLeft", downLeft);
-        if(right== 0 || right == 8) editor.putInt("right", right);
-        editor.commit();
-        Log.e("TAG", "------------- SHARED preferences = " + String.valueOf(localSharedPrefs.getInt("upLeft",11)) + "  " +
-                String.valueOf(localSharedPrefs.getInt("middLeft",11)) + "  " +
-                String.valueOf(localSharedPrefs.getInt("downLeft",11)) + "  " +
-                String.valueOf(localSharedPrefs.getInt("right",11)));
-    }
-
-
-    private void setEdgeVisibility() {
-
-        // ***** Switch-Case it's not working for Strings *****//
-
-        // Up - Left
-        if(edgeStatus.equals(Variables.UPLEFTVISIBLE)) {
-            upLeftCornerView.setVisibility(View.VISIBLE);
-            putInSharedPreferences(upLeftCornerView.getVisibility(), 11, 11, 11);
-        }
-        else if(edgeStatus.equals(Variables.UPLEFTGONE)) {
-            upLeftCornerView.setVisibility(View.GONE);
-            putInSharedPreferences(upLeftCornerView.getVisibility(), 11, 11, 11);
-        }
-        // Middle - Left
-        else if(edgeStatus.equals(Variables.MIDDLELEFTVISIBLE)) {
-            leftView.setVisibility(View.VISIBLE);
-            putInSharedPreferences(11, leftView.getVisibility(), 11, 11);
-            Log.e("TAG", "------ MIDDLE visible INTO edgeVisability() ----");
-        }
-        else if(edgeStatus.equals(Variables.MIDDLELEFTGONE)){
-            leftView.setVisibility(View.GONE);
-            putInSharedPreferences(11, leftView.getVisibility(), 11, 11);
-        }
-        // Down - Left
-        else if(edgeStatus.equals(Variables.DOWNLEFTVISIBLE)) {
-            downLeftCornerView.setVisibility(View.VISIBLE);
-            putInSharedPreferences(11, 11, downLeftCornerView.getVisibility(), 11);
-        }
-        else if(edgeStatus.equals(Variables.DOWNLEFTGONE)) {
-            downLeftCornerView.setVisibility(View.GONE);
-            putInSharedPreferences(11, 11, downLeftCornerView.getVisibility(), 11);
-        }
-        // Right
-        else if(edgeStatus.equals(Variables.RIGHTVISIBLE)) {
-            rightView.setVisibility(View.VISIBLE);
-            putInSharedPreferences(11, 11, 11, rightView.getVisibility());
-            Log.e("TAG", "------ RIGHT is VISIBLE -------     " + localSharedPrefs.getInt("middLeft", 55));
-            Log.e("TAG", "------------- shared preferences = " + String.valueOf(localSharedPrefs.getInt("upLeft",11)) + "  " +
-                    String.valueOf(localSharedPrefs.getInt("middLeft",11)) + "  " +
-                    String.valueOf(localSharedPrefs.getInt("downLeft",11)) + "  " +
-                    String.valueOf(localSharedPrefs.getInt("right",11)));
-        }
-        else if(edgeStatus.equals(Variables.RIGHTGONE)) {
-            rightView.setVisibility(View.GONE);
-            putInSharedPreferences(11, 11, 11, rightView.getVisibility());
-            Log.e("TAG", "------ RIGHT is INVISIBLE -------     " + localSharedPrefs.getInt("middLeft", 55));
-            Log.e("TAG", "------------- shared preferences = " + String.valueOf(localSharedPrefs.getInt("upLeft",11)) + "  " +
-                    String.valueOf(localSharedPrefs.getInt("middLeft",11)) + "  " +
-                    String.valueOf(localSharedPrefs.getInt("downLeft",11)) + "  " +
-                    String.valueOf(localSharedPrefs.getInt("right",11)));
-        }
-    }
-
-    private int getDisplayHeight(WindowManager windowManager) {
-        Display display = windowManager.getDefaultDisplay();
-        Point display_size = new Point();
-        display.getSize(display_size);
-
-        return display_size.y;
-    }
-
-    @Override
-    public void onDestroy() {
-
-        if(tv != null) windowManager.removeViewImmediate(tv);
-        if(leftView != null) windowManager.removeViewImmediate(leftView);
-        if(upLeftCornerView != null) windowManager.removeViewImmediate(upLeftCornerView);
-        if(downLeftCornerView != null) windowManager.removeViewImmediate(downLeftCornerView);
-        if(rightView != null) windowManager.removeViewImmediate(rightView);
-
-        //Toast.makeText(this, "Destroy ...", Toast.LENGTH_LONG).show();
-        stopSelf();
-        super.onDestroy();
     }
 }

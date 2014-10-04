@@ -16,7 +16,7 @@ import java.util.Set;
  */
 public class StartUpNotificationListenerService extends WearableListenerService {
     private Intent serviceIntent;
-    private static final String tag = "edge.brightness";
+    private static final String tag = "edge.brightness.wearable.listener";
 
     private Set<String> edgeStatusList;
     private String edgeStatus;
@@ -64,7 +64,7 @@ public class StartUpNotificationListenerService extends WearableListenerService 
         String messagePath = messageEvent.getPath();
 
         if (messagePath.equals(Variables.START)) {
-            Log.e("TAG", "*********************** MEssage is received on Wear *****************************");
+            Log.e(tag, "*********************** Message is received on Wear *****************************");
             startService(serviceIntent);
         }
         else if (messagePath.equals(Variables.STOP)) {
