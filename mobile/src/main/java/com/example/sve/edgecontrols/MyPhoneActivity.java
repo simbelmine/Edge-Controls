@@ -71,31 +71,31 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
     @Override
     protected void onStart() {
         mGoogleApiClient.connect();
-        Log.e("TAG", "onStart ......... ");
+        Log.e(tag, "onStart ......... ");
         super.onStart();
     }
 
     @Override
     protected void onResume() {
-        Log.e("TAG", "onResume .........");
+        Log.e(tag, "onResume .........");
         super.onResume();
     }
 
     @Override
     public void onConnected(Bundle bundle) {
-        Log.e("TAG", "onConnected ....");
+        Log.e(tag, "onConnected ....");
         onWearableConnected();
     }
 
     @Override
     protected void onPause() {
-        Log.e("TAG", "onPAUSE .........");
+        Log.e(tag, "onPAUSE .........");
         super.onPause();
     }
 
     @Override
     protected void onStop() {
-        Log.e("TAG", "onStop .........");
+        Log.e(tag, "onStop .........");
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
@@ -140,7 +140,7 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
 
     private void startWearableFloatingService() {
 
-        Log.e("TAG", "startTheCorrectScreen ........");
+        Log.e(tag, "startTheCorrectScreen ........");
         setContentView(R.layout.main);
 
         settings = (Button) findViewById(R.id.settings);
@@ -194,10 +194,10 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
     private void sendMessageToWear(final String variable) {
 //        if (!mGoogleApiClient.isConnected()) {
 //            mGoogleApiClient.connect();
-////            Log.e("TAG", " ...... isConnected = " + mGoogleApiClient.isConnected());
+////            Log.e(tag, " ...... isConnected = " + mGoogleApiClient.isConnected());
 //        }
 
-        Log.e("TAG", "sendMessage to Wear....   " + variable + " ...... isConnected = " + mGoogleApiClient.isConnected());
+        Log.e(tag, "sendMessage to Wear....   " + variable + " ...... isConnected = " + mGoogleApiClient.isConnected());
 
         new Thread(new Runnable() {
             @Override
@@ -206,9 +206,9 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
                 if(connectionResult.isSuccess()) {
                     //Wearable.MessageApi.sendMessage(mGoogleApiClient, nodeId, variable, null);
                     MessageApi.SendMessageResult result = Wearable.MessageApi.sendMessage(mGoogleApiClient, nodeId, variable, null).await();
-                    Log.e("TAG", "MEssage result = " + result.getStatus());
+                    Log.e(tag, "MEssage result = " + result.getStatus());
                     if(result.getStatus().isSuccess()) {
-                        Log.e("TAG", "*********************** Message Send to WEAR *****************************");
+                        Log.e(tag, "*********************** Message Send to WEAR *****************************");
                         if(variable.equals(Variables.START)) {
                             //isStarted = false;
                             isStopEnabled = true;
@@ -218,16 +218,16 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
                         }
                     }
                     else {
-                        Log.e("TAG", "Failed to send the Message: " + variable);
+                        Log.e(tag, "Failed to send the Message: " + variable);
 //                        isStarted = false;
                         isStopEnabled = true;
                     }
 
-                    Log.e("TAG", "Connection established : "
+                    Log.e(tag, "Connection established : "
                             + connectionResult.getErrorCode() + "     ***    " + variable);
                 }
                 else {
-                    Log.e("TAG", "Failed to establish Connection: "
+                    Log.e(tag, "Failed to establish Connection: "
                             + connectionResult.getErrorCode() + "     ***    " + variable);
                 }
                 mGoogleApiClient.disconnect();
