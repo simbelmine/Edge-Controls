@@ -12,22 +12,33 @@ android {
         versionName "1.0"
     }
 
-//    signingConfigs {
-//        release {
-//            Properties props = new Properties()
-//            props.load(new FileInputStream(project.rootProject.file("signing.properties")))
-//            storeFile file("${props.get("signing.storeFile")}")
-//            storePassword "${props.get("signing.storePass")}"
-//            keyAlias "${props.get("signing.storeAlias")}"
-//            keyPassword "${props.get("signing.storePass")}"
-//        }
-//    }
+    signingConfigs {
+        release {
+            Properties props = new Properties()
+            props.load(new FileInputStream(project.rootProject.file("signing.properties")))
+            storeFile file("${props.get("signing.storeFile")}")
+            storePassword "${props.get("signing.storePass")}"
+            keyAlias "${props.get("signing.storeAlias")}"
+            keyPassword "${props.get("signing.storePass")}"
+        }
+        debug {
+            Properties props = new Properties()
+            props.load(new FileInputStream(project.rootProject.file("signing.properties")))
+            storeFile file("${props.get("signing.storeFile")}")
+            storePassword "${props.get("signing.storePass")}"
+            keyAlias "${props.get("signing.storeAlias")}"
+            keyPassword "${props.get("signing.storePass")}"
+        }
+    }
 
     buildTypes {
         release {
             runProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-//            signingConfig signingConfigs.release
+            signingConfig signingConfigs.release
+        }
+        debug {
+            signingConfig signingConfigs.debug
         }
     }
 }
