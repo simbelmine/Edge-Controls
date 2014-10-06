@@ -160,10 +160,10 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
             start.setEnabled(true);
             start.setBackground(getResources().getDrawable(R.drawable.button_style_up));
             stop.setEnabled(false);
-            stop.setTextColor(Color.parseColor("#888888"));
+            stop.setTextColor(getResources().getColor(R.color.gray));
         } else {
             start.setEnabled(false);
-            start.setTextColor(Color.parseColor("#888888"));
+            start.setTextColor(getResources().getColor(R.color.gray));
             stop.setEnabled(true);
             stop.setBackground(getResources().getDrawable(R.drawable.button_style_up));
         }
