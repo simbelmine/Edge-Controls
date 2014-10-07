@@ -1,4 +1,4 @@
-package com.example.sve.edgecontrols;
+package com.edgecontrols.android;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.example.sve.edgecontrols.R;
 import com.example.sve.module.Variables;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;

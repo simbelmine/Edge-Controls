@@ -1,4 +1,4 @@
-package com.example.sve.edgecontrols;
+package com.edgecontrols.android;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.sve.edgecontrols.R;
 import com.example.sve.module.Variables;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;

@@ -1,4 +1,4 @@
-package com.example.sve.edgecontrols;
+package com.edgecontrols.android;
 
 import android.content.Intent;
 import android.content.SharedPreferences;

@@ -16,7 +16,7 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".MyPhoneActivity"
+            android:name="com.edgecontrols.android.MyPhoneActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,9 +25,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".SettingsActivity"/>
+        <activity android:name="com.edgecontrols.android.SettingsActivity"/>
 
-        <service android:name=".ListeningService"
+        <service android:name="com.edgecontrols.android.ListeningService"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
