@@ -36,12 +36,11 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
     private Button start;
     private Button stop;
 
-    public static final String tag = "edge.brightness";
+    public static final String tag = "edgecontrols.brightness";
 
     private int numWearables;
     private String nodeId;
 
-    private static boolean isStarted = false;
     private static boolean serviceStarted = false;
     private SharedPreferences sharedPreferences;
     boolean stopThread = false;
@@ -65,20 +64,20 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
             Log.v(tag, "thread notified for connection!");
 
             while (!stopThread) {
-                slowDown();
                 Log.v(tag, "trying to start the service.... " + serviceStarted);
-                if (!isServiceStarted()) {
-                    sendMessageToWear(Variables.START);
+                if (!serviceStarted) {
+                    sendMessage(Variables.START);
                 } else {
                     stopThread = true;
                 }
                 updateButtons();
+                slowDown();
             }
         }
 
         private void slowDown() {
             try {
-                Thread.currentThread().sleep(100);
+                Thread.currentThread().sleep(3000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -120,10 +119,6 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .build();
-
-        sharedPreferences = getSharedPreferences("MyMobilePrefs", 0);
-//        boolean new_isStarted = sharedPreferences.getBoolean("isStarted", isStarted);
-        serviceStarted = isServiceStarted();
 
         initializeViews();
 
@@ -311,35 +306,7 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
         new Thread(new Runnable() {
             @Override
             public void run() {
-                ConnectionResult connectionResult = mGoogleApiClient.blockingConnect();
-                if(connectionResult.isSuccess()) {
-                        //Wearable.MessageApi.sendMessage(mGoogleApiClient, nodeId, variable, null);
-                    if(!isStarted) {
-                        sendDummy();
-                        if(isReceived()) {
-                            isStarted = true;
-                            sendMessage(variable);
-                        }
-                        else {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(getApplicationContext(), "Waiting to connect. Please try again.", Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                        }
-                    }
-                    else {
-                        sendMessage(variable);
-                        Log.e(tag, "Connection established : "
-                                + connectionResult.getErrorCode() + "     ***    " + variable);
-                        }
-                }
-                else {
-                    Log.e(tag, "Failed to establish Connection: "
-                            + connectionResult.getErrorCode() + "     ***    " + variable);
-                }
-                mGoogleApiClient.disconnect();
+                sendMessage(variable);
             }
         }).start();
 
@@ -347,17 +314,25 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
     }
 
     private void sendMessage(String variable) {
-        MessageApi.SendMessageResult result = Wearable.MessageApi.sendMessage(mGoogleApiClient, nodeId, variable, null).await();
-        if (result.getStatus().isSuccess()) {
-            if (variable.equals(Variables.START)) {
-                serviceStarted = true;
-            } else if (variable.equals(Variables.STOP)) {
-                serviceStarted = false;
+        try {
+//            ConnectionResult connectionResult = mGoogleApiClient.blockingConnect();
+//            if (connectionResult.isSuccess()) {
+//                Log.v(tag, "connected to send a message");
+//            } else {
+//                Log.v(tag, "could not connect: " + connectionResult.getErrorCode() + " " + connectionResult.getResolution());
+//                return;
+//            }
+            MessageApi.SendMessageResult result;
+            result = Wearable.MessageApi.sendMessage(mGoogleApiClient, nodeId, variable, null).await();
+            if (result.getStatus().isSuccess()) {
+                Log.e(tag, "sending message to wear success: " + variable);
+            } else {
+                Log.e(tag, "Failed to send the Message: " + variable);
             }
-        } else {
-            Log.e(tag, "Failed to send the Message: " + variable);
-            serviceStarted = true;
+        } finally {
+            mGoogleApiClient.disconnect();
         }
+
     }
 
     private void sendDummy() {
