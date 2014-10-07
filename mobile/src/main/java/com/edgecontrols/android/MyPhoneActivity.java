@@ -21,7 +21,6 @@ import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -43,10 +42,9 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
     private SharedPreferences sharedPreferences;
     boolean stopThread = false;
     boolean connected = false;
+    boolean isStopPressed = false;
 
     private Object lock = new Object();
-
-    private StarterThread thread = new StarterThread();
 
     private class StarterThread extends Thread {
         @Override
@@ -61,21 +59,23 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
             }
             Log.v(tag, "thread notified for connection!");
 
+            slowDown(5000);
+
             while (!stopThread) {
                 Log.v(tag, "trying to start the service.... " + serviceStarted);
                 if (!serviceStarted) {
-                    sendMessage(Variables.START);
+                    sendSingleMessage(Variables.START);
                 } else {
                     stopThread = true;
                 }
                 updateButtons();
-                slowDown();
+                slowDown(3000);
             }
         }
 
-        private void slowDown() {
+        private void slowDown(int sec) {
             try {
-                Thread.currentThread().sleep(3000);
+                Thread.currentThread().sleep(sec);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -105,6 +105,7 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Title Bar's Logo
         final TextView title = (TextView) findViewById(android.R.id.title);
         if (title != null) {
             title.setPadding(10, 0, 0, 0);
@@ -125,9 +126,9 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
             thread.start();
         }
 
-        Log.v(tag, "main activity on create");
 
-        registerStartedBroadcastReceiver();
+
+        Log.v(tag, "onCreate ..........................");
     }
 
     private void registerStartedBroadcastReceiver() {
@@ -138,7 +139,7 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
             public void onReceive(Context context, Intent intent) {
                 Log.v(tag, "phone sent STARTED");
                 serviceStarted = true;
-                updateStartStopButtons();
+                initializeViews();
             }
         };
         registerReceiver(receiver, filter);
@@ -178,6 +179,8 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
     @Override
     public void onConnected(Bundle bundle) {
         Log.e(tag, "onConnected ....");
+
+        registerStartedBroadcastReceiver();
 
         new Thread() {
             @Override
@@ -225,6 +228,7 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
     }
 
     private void saveNodes() {
+        Log.e(tag, "================ SAve Nodes....... ");
         NodeApi.GetConnectedNodesResult connectedNodesResult =
                 Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
         boolean isWearableConnected = isWearableConnected(connectedNodesResult);
@@ -236,7 +240,17 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
             editor.putString("nodeId", nodeId);
             editor.putInt("numWearables", numWearables);
             editor.commit();
+
+            Log.e(tag, "================  NODES ... MAIN view....... ");
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    initializeViews();
+                }
+            });
+
         } else {
+            Log.e(tag, "================ NODES ... NO nodes ....... ");
             showWearableNotConnected();
         }
         mGoogleApiClient.disconnect();
@@ -249,7 +263,7 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
 
     private void initializeViews() {
 
-        Log.e(tag, "startTheCorrectScreen ........");
+        Log.e(tag, "Init the MAIN view ........");
         setContentView(R.layout.main);
 
         settings = (Button) findViewById(R.id.settings);
@@ -282,7 +296,7 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
     }
 
     private void updateStartStopButtons() {
-        if (!serviceStarted) {
+        if (!serviceStarted || isStopPressed) {
             if (!stopThread) {
                 start.setEnabled(false);
                 start.setText("Starting...");
@@ -290,10 +304,9 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
                 start.setEnabled(true);
                 start.setBackground(getResources().getDrawable(R.drawable.button_style_up));
             }
-
             stop.setEnabled(false);
             stop.setTextColor(getResources().getColor(R.color.gray));
-        } else {
+        } else if(!isStopPressed){
             start.setEnabled(false);
             start.setTextColor(getResources().getColor(R.color.gray));
             stop.setEnabled(true);
@@ -314,32 +327,39 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
         new Thread(new Runnable() {
             @Override
             public void run() {
-                sendMessage(variable);
+                sendSingleMessage(variable);
             }
         }).start();
 
 
     }
 
-    private void sendMessage(String variable) {
-        try {
+    private void sendSingleMessage(String variable) {
+//        try {
             ConnectionResult connectionResult = mGoogleApiClient.blockingConnect();
             if (connectionResult.isSuccess()) {
                 Log.v(tag, "connected to send a message");
+                MessageApi.SendMessageResult result;
+                result = Wearable.MessageApi.sendMessage(mGoogleApiClient, nodeId, variable, null).await();
+                if (result.getStatus().isSuccess()) {
+                    Log.e(tag, "sending message to wear success: " + variable);
+                    if(Variables.START.equals(variable)) {
+                        isStopPressed = false;
+                    }
+                    if(Variables.STOP.equals(variable)) {
+                        isStopPressed = true;
+                    }
+                } else {
+                    Log.e(tag, "Failed to send the Message: " + variable);
+                }
+                //mGoogleApiClient.disconnect();
             } else {
                 Log.v(tag, "could not connect: " + connectionResult.getErrorCode() + " " + connectionResult.getResolution());
                 return;
             }
-            MessageApi.SendMessageResult result;
-            result = Wearable.MessageApi.sendMessage(mGoogleApiClient, nodeId, variable, null).await();
-            if (result.getStatus().isSuccess()) {
-                Log.e(tag, "sending message to wear success: " + variable);
-            } else {
-                Log.e(tag, "Failed to send the Message: " + variable);
-            }
-        } finally {
-            mGoogleApiClient.disconnect();
-        }
+//        } finally {
+//            mGoogleApiClient.disconnect();
+//        }
 
     }
 

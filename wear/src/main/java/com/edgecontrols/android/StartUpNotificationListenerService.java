@@ -87,13 +87,13 @@ public class StartUpNotificationListenerService extends WearableListenerService 
         String messagePath = messageEvent.getPath();
 
         if(messagePath.equals("DUMMY")) {
-            Log.e(tag, "*********************** DUMMY *****************************");
             onWearableConnected();
         }
         else if (messagePath.equals(Variables.START)) {
-            Log.e(tag, "*********************** Message is received on Wear *****************************");
+            Log.e(tag, "*********************** START (on WEAR) *****************************");
             startService(serviceIntent);
-            sendMessageToPhone("STARTED");
+            //sendMessageToPhone("STARTED");
+            onWearableConnected();
         }
         else if (messagePath.equals(Variables.STOP)) {
             stopService(serviceIntent);
@@ -127,7 +127,7 @@ public class StartUpNotificationListenerService extends WearableListenerService 
                     editor.putString("nodeId", nodeId);
                     editor.commit();
 
-                    sendMessageToPhone("DUMMY");
+                    sendMessageToPhone("STARTED");
                 }
                 googleApiClient.disconnect();
             }
@@ -162,12 +162,6 @@ public class StartUpNotificationListenerService extends WearableListenerService 
             }
         }).start();
     }
-
-//    @Override
-//    public void onPeerConnected(Node peer) {
-//        super.onPeerConnected(peer);
-//        nodeId = peer.getId();
-//    }
 
     private String getEdgeStatusIfCompatible(String messagePath) {
         for(String status : edgeStatusList) {

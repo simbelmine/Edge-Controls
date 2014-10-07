@@ -12,7 +12,7 @@ import com.google.android.gms.wearable.WearableListenerService;
  * Created by Sve on 10/6/14.
  */
 public class ListeningService extends WearableListenerService {
-    public static final String tag = "edge.brightness";
+    public static final String tag = "edgecontrols.brightness";
     private SharedPreferences sharedPreferences;
     private Boolean isReceived = false;
 
@@ -21,7 +21,6 @@ public class ListeningService extends WearableListenerService {
         String messagePath = messageEvent.getPath();
 
         if(messagePath.equals("DUMMY")) {
-            Log.e(tag, "####### it's RECEIVED....");
             isReceived = true;
 
             sharedPreferences = getSharedPreferences("MyMobilePrefs", 0);
@@ -34,15 +33,13 @@ public class ListeningService extends WearableListenerService {
             intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
             intent.setAction("com.edgecontrols.receiver.STARTED");
             sendBroadcast(intent);
+            Log.e(tag, "####### it's RECEIVED....");
         }
         if ("STOPPED".equals(messagePath)) {
             Intent intent = new Intent();
             intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
             intent.setAction("com.edgecontrols.receiver.STOPPED");
             sendBroadcast(intent);
-        }
-        else {
-            Log.e(tag, "####### NOT RECEIVED.... :(");
         }
 
     }

@@ -46,7 +46,7 @@ public class FloatingService extends Service {
     private String edgeVisibilityParam;
     private SharedPreferences localSharedPrefs;
     private Context context;
-    private String tag = "edge.brightness.floating";
+    private static final String tag = "edge.brightness.wearable.listener";
     private boolean viewsAddedToWM = false;
 
 
@@ -76,7 +76,7 @@ public class FloatingService extends Service {
             edgeVisibilityParam = getStatusFromExtras(intent);
         }
 
-        Log.e("TAG", "******** Edge status = " + edgeVisibilityParam);
+        Log.e(tag, "******** EDGE status = " + edgeVisibilityParam + "***************");
 //        Log.e("TAG", "************** SHARED PREFS = " + String.valueOf(localSharedPrefs.getInt("upLeft",11)) + "  " +
 //                String.valueOf(localSharedPrefs.getInt("middLeft",11)) + "  " +
 //                String.valueOf(localSharedPrefs.getInt("downLeft",11)) + "  " +
