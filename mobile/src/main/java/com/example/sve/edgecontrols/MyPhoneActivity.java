@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.sve.module.Variables;
 import com.google.android.gms.common.ConnectionResult;
@@ -37,7 +38,7 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
     private int numWearables;
     private String nodeId;
 
-//    private static boolean isStarted = false;
+    private static boolean isStarted = false;
     private static boolean isStopEnabled = false;
     private SharedPreferences sharedPreferences;
 
@@ -84,6 +85,7 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
     @Override
     public void onConnected(Bundle bundle) {
         Log.e(tag, "onConnected ....");
+
         onWearableConnected();
     }
 
@@ -102,7 +104,6 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
 
         sharedPreferences = getSharedPreferences("MyMobilePrefs", 0);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-//        editor.putBoolean("isStarted", isStarted);
         editor.putBoolean("isStopEnabled", isStopEnabled);
         editor.commit();
 
@@ -118,11 +119,11 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
                 if (isWearableConnected) {
                     nodeId = getConnectedNodesResult.getNodes().get(0).getId();
 
-                    sharedPreferences = getSharedPreferences("MyPrefs", 0);
+                    sharedPreferences = getSharedPreferences("MyMobilePrefs", 0);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString("nodeId", nodeId);
+                    editor.putInt("numWearables", numWearables);
                     editor.commit();
-
                     startWearableFloatingService();
                 } else {
                     showWearableNotConnected();
@@ -192,39 +193,32 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
     }
 
     private void sendMessageToWear(final String variable) {
-//        if (!mGoogleApiClient.isConnected()) {
-//            mGoogleApiClient.connect();
-////            Log.e(tag, " ...... isConnected = " + mGoogleApiClient.isConnected());
-//        }
-
-        Log.e(tag, "sendMessage to Wear....   " + variable + " ...... isConnected = " + mGoogleApiClient.isConnected());
-
         new Thread(new Runnable() {
             @Override
             public void run() {
                 ConnectionResult connectionResult = mGoogleApiClient.blockingConnect();
                 if(connectionResult.isSuccess()) {
-                    //Wearable.MessageApi.sendMessage(mGoogleApiClient, nodeId, variable, null);
-                    MessageApi.SendMessageResult result = Wearable.MessageApi.sendMessage(mGoogleApiClient, nodeId, variable, null).await();
-                    Log.e(tag, "MEssage result = " + result.getStatus());
-                    if(result.getStatus().isSuccess()) {
-                        Log.e(tag, "*********************** Message Send to WEAR *****************************");
-                        if(variable.equals(Variables.START)) {
-                            //isStarted = false;
-                            isStopEnabled = true;
+                        //Wearable.MessageApi.sendMessage(mGoogleApiClient, nodeId, variable, null);
+                    if(!isStarted) {
+                        sendDummy();
+                        if(isReceived()) {
+                            isStarted = true;
+                            sendMessage(variable);
                         }
-                        else if(variable.equals(Variables.STOP)) {
-                            isStopEnabled = false;
+                        else {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(getApplicationContext(), "Waiting to connect. Please try again.", Toast.LENGTH_SHORT).show();
+                                }
+                            });
                         }
                     }
                     else {
-                        Log.e(tag, "Failed to send the Message: " + variable);
-//                        isStarted = false;
-                        isStopEnabled = true;
-                    }
-
-                    Log.e(tag, "Connection established : "
-                            + connectionResult.getErrorCode() + "     ***    " + variable);
+                        sendMessage(variable);
+                        Log.e(tag, "Connection established : "
+                                + connectionResult.getErrorCode() + "     ***    " + variable);
+                        }
                 }
                 else {
                     Log.e(tag, "Failed to establish Connection: "
@@ -235,6 +229,32 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
         }).start();
 
 
+    }
+
+    private void sendMessage(String variable) {
+        MessageApi.SendMessageResult result = Wearable.MessageApi.sendMessage(mGoogleApiClient, nodeId, variable, null).await();
+        if (result.getStatus().isSuccess()) {
+            if (variable.equals(Variables.START)) {
+                isStopEnabled = true;
+            } else if (variable.equals(Variables.STOP)) {
+                isStopEnabled = false;
+            }
+        } else {
+            Log.e(tag, "Failed to send the Message: " + variable);
+            isStopEnabled = true;
+        }
+    }
+
+    private void sendDummy() {
+        Wearable.MessageApi.sendMessage(mGoogleApiClient, nodeId, "DUMMY", null);
+    }
+
+    private boolean isReceived() {
+        sharedPreferences = getSharedPreferences("MyMobilePrefs", 0);
+        if(sharedPreferences.getBoolean("isReceived", false)) {
+            return true;
+        }
+        return false;
     }
 
     @Override

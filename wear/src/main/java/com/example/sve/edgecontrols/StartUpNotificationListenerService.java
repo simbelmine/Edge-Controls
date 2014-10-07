@@ -5,10 +5,19 @@ import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.example.sve.module.Variables;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.MessageEvent;
+import com.google.android.gms.wearable.Node;
+import com.google.android.gms.wearable.NodeApi;
+import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -22,6 +31,11 @@ public class StartUpNotificationListenerService extends WearableListenerService 
     private String edgeStatus;
     private SharedPreferences sharedPreferences;
 
+    private String nodeId;
+    private GoogleApiClient googleApiClient;
+    private List<Node> connectedNodes;
+    private int numWearables;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -31,6 +45,15 @@ public class StartUpNotificationListenerService extends WearableListenerService 
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putStringSet("edgeStatusList", edgeStatusList);
         editor.commit();
+
+        connectGoogleApiClient();
+    }
+
+    private void connectGoogleApiClient() {
+        googleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(Wearable.API)
+                .build();
+        googleApiClient.connect();
     }
 
     private void fillEdgesList() {
@@ -63,7 +86,11 @@ public class StartUpNotificationListenerService extends WearableListenerService 
         serviceIntent = new Intent(this, FloatingService.class);
         String messagePath = messageEvent.getPath();
 
-        if (messagePath.equals(Variables.START)) {
+        if(messagePath.equals("DUMMY")) {
+            Log.e(tag, "*********************** DUMMY *****************************");
+            onWearableConnected();
+        }
+        else if (messagePath.equals(Variables.START)) {
             Log.e(tag, "*********************** Message is received on Wear *****************************");
             startService(serviceIntent);
         }
@@ -79,6 +106,66 @@ public class StartUpNotificationListenerService extends WearableListenerService 
 
         super.onMessageReceived(messageEvent);
     }
+
+
+
+
+
+    private void onWearableConnected() {
+        connectedNodes = new ArrayList<Node>();
+        Wearable.NodeApi.getConnectedNodes(googleApiClient).setResultCallback(new ResultCallback<NodeApi.GetConnectedNodesResult>() {
+            @Override
+            public void onResult(NodeApi.GetConnectedNodesResult getConnectedNodesResult) {
+                boolean isWearableConnected = isWearableConnected(getConnectedNodesResult);
+                if (isWearableConnected) {
+                    nodeId = getConnectedNodesResult.getNodes().get(0).getId();
+
+                    sharedPreferences = getSharedPreferences("MyPrefs", 0);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("nodeId", nodeId);
+                    editor.commit();
+
+                    sendMessageToPhone("DUMMY");
+                }
+                googleApiClient.disconnect();
+            }
+        });
+    }
+
+    private boolean isWearableConnected(NodeApi.GetConnectedNodesResult getConnectedNodesResult) {
+        connectedNodes = getConnectedNodesResult.getNodes();
+        numWearables = connectedNodes.size();
+        return numWearables > 0;
+    }
+
+    private void sendMessageToPhone(final String variable) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                ConnectionResult connectionResult = googleApiClient.blockingConnect();
+                if(connectionResult.isSuccess()) {
+                    Log.e(tag, "----------- nodeID = " + nodeId);
+                    MessageApi.SendMessageResult result = Wearable.MessageApi.sendMessage(googleApiClient, nodeId, variable, null).await();
+                    if (result.getStatus().isSuccess()) {
+                        Log.e(tag, "SUCCESS to send the Message (to PHONE): " + variable);
+                    } else {
+                        Log.e(tag, "Failed to send the Message (to PHONE): " + variable);
+                    }
+                }
+                else {
+                    Log.e(tag, "Failed to establish Connection(to PHONE): "
+                            + connectionResult.getErrorCode() + "     ***    " + variable);
+                }
+                googleApiClient.disconnect();
+            }
+        }).start();
+    }
+
+//    @Override
+//    public void onPeerConnected(Node peer) {
+//        super.onPeerConnected(peer);
+//        nodeId = peer.getId();
+//    }
 
     private String getEdgeStatusIfCompatible(String messagePath) {
         for(String status : edgeStatusList) {
