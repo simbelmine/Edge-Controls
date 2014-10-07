@@ -11,13 +11,11 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.sve.edgecontrols.R;
 import com.example.sve.module.Variables;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
@@ -181,7 +179,22 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
     public void onConnected(Bundle bundle) {
         Log.e(tag, "onConnected ....");
 
-        onWearableConnected();
+        new Thread() {
+            @Override
+            public void run() {
+                saveNodes();
+                notifyStartThread();
+            }
+        }.start();
+    }
+
+    private void notifyStartThread() {
+        if (nodeId != null) {
+            connected = true;
+            synchronized (lock) {
+                lock.notify();
+            }
+        }
     }
 
     @Override
@@ -211,37 +224,27 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
         editor.commit();
     }
 
-    private void onWearableConnected() {
-        connectedNodes = new ArrayList<Node>();
-        Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).setResultCallback(new ResultCallback<NodeApi.GetConnectedNodesResult>() {
-            @Override
-            public void onResult(NodeApi.GetConnectedNodesResult getConnectedNodesResult) {
-                boolean isWearableConnected = isWearableConnected(getConnectedNodesResult);
-                if (isWearableConnected) {
-                    nodeId = getConnectedNodesResult.getNodes().get(0).getId();
+    private void saveNodes() {
+        NodeApi.GetConnectedNodesResult connectedNodesResult =
+                Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
+        boolean isWearableConnected = isWearableConnected(connectedNodesResult);
+        if (isWearableConnected) {
+            nodeId = connectedNodesResult.getNodes().get(0).getId();
 
-                    sharedPreferences = getSharedPreferences("MyMobilePrefs", 0);
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putString("nodeId", nodeId);
-                    editor.putInt("numWearables", numWearables);
-                    editor.commit();
-
-                    connected = true;
-                    synchronized (lock) {
-                        lock.notify();
-                    }
-                } else {
-                    showWearableNotConnected();
-                }
-                mGoogleApiClient.disconnect();
-            }
-        });
+            sharedPreferences = getSharedPreferences("MyMobilePrefs", 0);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString("nodeId", nodeId);
+            editor.putInt("numWearables", numWearables);
+            editor.commit();
+        } else {
+            showWearableNotConnected();
+        }
+        mGoogleApiClient.disconnect();
     }
 
-    private boolean isWearableConnected(NodeApi.GetConnectedNodesResult getConnectedNodesResult) {
-        connectedNodes = getConnectedNodesResult.getNodes();
-        numWearables = connectedNodes.size();
-        return numWearables > 0;
+    private boolean isWearableConnected(NodeApi.GetConnectedNodesResult connectedNodesResult) {
+        return connectedNodesResult.getNodes() != null &&
+                connectedNodesResult.getNodes().size() > 0;
     }
 
     private void initializeViews() {
@@ -299,7 +302,12 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
     }
 
     private void showWearableNotConnected() {
-        setContentView(R.layout.no_device);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                setContentView(R.layout.no_device);
+            }
+        });
     }
 
     private void sendMessageToWear(final String variable) {
@@ -315,13 +323,13 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
 
     private void sendMessage(String variable) {
         try {
-//            ConnectionResult connectionResult = mGoogleApiClient.blockingConnect();
-//            if (connectionResult.isSuccess()) {
-//                Log.v(tag, "connected to send a message");
-//            } else {
-//                Log.v(tag, "could not connect: " + connectionResult.getErrorCode() + " " + connectionResult.getResolution());
-//                return;
-//            }
+            ConnectionResult connectionResult = mGoogleApiClient.blockingConnect();
+            if (connectionResult.isSuccess()) {
+                Log.v(tag, "connected to send a message");
+            } else {
+                Log.v(tag, "could not connect: " + connectionResult.getErrorCode() + " " + connectionResult.getResolution());
+                return;
+            }
             MessageApi.SendMessageResult result;
             result = Wearable.MessageApi.sendMessage(mGoogleApiClient, nodeId, variable, null).await();
             if (result.getStatus().isSuccess()) {
