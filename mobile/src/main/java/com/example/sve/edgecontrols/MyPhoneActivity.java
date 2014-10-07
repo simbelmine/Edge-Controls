@@ -1,9 +1,11 @@
 package com.example.sve.edgecontrols;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -39,9 +41,67 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
     private String nodeId;
 
     private static boolean isStarted = false;
-    private static boolean isStopEnabled = false;
+    private static boolean serviceStarted = false;
     private SharedPreferences sharedPreferences;
+    boolean stopThread = false;
+    boolean connected = false;
 
+    private Object lock = new Object();
+
+    private StarterThread thread = new StarterThread();
+
+    private class StarterThread extends Thread {
+        @Override
+        public void run() {
+            super.run();
+
+            updateButtons();
+
+            if (!connected) {
+                Log.v(tag, "thread waits for connection!");
+                waitToConnect();
+            }
+            Log.v(tag, "thread notified for connection!");
+
+            while (!stopThread) {
+                slowDown();
+                Log.v(tag, "trying to start the service.... " + serviceStarted);
+                if (!isServiceStarted()) {
+                    sendMessageToWear(Variables.START);
+                } else {
+                    stopThread = true;
+                }
+                updateButtons();
+            }
+        }
+
+        private void slowDown() {
+            try {
+                Thread.currentThread().sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        private void waitToConnect() {
+            synchronized (lock) {
+                try {
+                    lock.wait();
+                } catch (InterruptedException e) {
+                    Log.v(tag, "exception:" + e.getMessage());
+                }
+            }
+        }
+
+        public void updateButtons() {
+            MyPhoneActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    updateStartStopButtons();
+                }
+            });
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,11 +122,50 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
 
         sharedPreferences = getSharedPreferences("MyMobilePrefs", 0);
 //        boolean new_isStarted = sharedPreferences.getBoolean("isStarted", isStarted);
-        boolean isStopEnabled_new = sharedPreferences.getBoolean("isStopEnabled", isStopEnabled);
-//        isStarted = new_isStarted;
-        isStopEnabled = isStopEnabled_new;
+        serviceStarted = isServiceStarted();
+
+        initializeViews();
+
+        if (!serviceStarted) {
+            StarterThread thread = new StarterThread();
+            thread.start();
+        }
 
         Log.v(tag, "main activity on create");
+
+        registerStartedBroadcastReceiver();
+    }
+
+    private void registerStartedBroadcastReceiver() {
+        IntentFilter filter = new IntentFilter("com.edgecontrols.receiver.STARTED");
+
+        BroadcastReceiver receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.v(tag, "phone sent STARTED");
+                serviceStarted = true;
+                updateStartStopButtons();
+            }
+        };
+        registerReceiver(receiver, filter);
+    }
+
+    private void registerStoppedBroadcastReceiver() {
+        IntentFilter filter = new IntentFilter("com.edgecontrols.receiver.STOPPED");
+
+        BroadcastReceiver receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.v(tag, "phone sent STOPPED");
+                serviceStarted = false;
+                updateStartStopButtons();
+            }
+        };
+        registerReceiver(receiver, filter);
+    }
+
+    private boolean isServiceStarted() {
+        return serviceStarted;
     }
 
     @Override
@@ -93,6 +192,8 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
     protected void onPause() {
         Log.e(tag, "onPAUSE .........");
         super.onPause();
+
+        stopThread = true;
     }
 
     @Override
@@ -102,12 +203,16 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
             mGoogleApiClient.disconnect();
         }
 
-        sharedPreferences = getSharedPreferences("MyMobilePrefs", 0);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean("isStopEnabled", isStopEnabled);
-        editor.commit();
+        saveServiceStarted(false);
 
         super.onStop();
+    }
+
+    private void saveServiceStarted(boolean b) {
+        SharedPreferences sharedPreferences = getSharedPreferences("MyMobilePrefs", 0);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("serviceStarted", serviceStarted);
+        editor.commit();
     }
 
     private void onWearableConnected() {
@@ -124,7 +229,11 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
                     editor.putString("nodeId", nodeId);
                     editor.putInt("numWearables", numWearables);
                     editor.commit();
-                    startWearableFloatingService();
+
+                    connected = true;
+                    synchronized (lock) {
+                        lock.notify();
+                    }
                 } else {
                     showWearableNotConnected();
                 }
@@ -139,7 +248,7 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
         return numWearables > 0;
     }
 
-    private void startWearableFloatingService() {
+    private void initializeViews() {
 
         Log.e(tag, "startTheCorrectScreen ........");
         setContentView(R.layout.main);
@@ -156,18 +265,7 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
         start = (Button) findViewById(R.id.start_btn);
         stop = (Button) findViewById(R.id.stop_btn);
 
-
-        if (!isStopEnabled) {
-            start.setEnabled(true);
-            start.setBackground(getResources().getDrawable(R.drawable.button_style_up));
-            stop.setEnabled(false);
-            stop.setTextColor(getResources().getColor(R.color.gray));
-        } else {
-            start.setEnabled(false);
-            start.setTextColor(getResources().getColor(R.color.gray));
-            stop.setEnabled(true);
-            stop.setBackground(getResources().getDrawable(R.drawable.button_style_up));
-        }
+        updateStartStopButtons();
 
         start.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -182,10 +280,26 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
                 sendMessageToWear(Variables.STOP);
             }
         });
-//
-//        if (!isStarted) {
-//            sendMessageToWear(Variables.START);
-//        }
+    }
+
+    private void updateStartStopButtons() {
+        if (!serviceStarted) {
+            if (!stopThread) {
+                start.setEnabled(false);
+                start.setText("Starting...");
+            } else {
+                start.setEnabled(true);
+                start.setBackground(getResources().getDrawable(R.drawable.button_style_up));
+            }
+
+            stop.setEnabled(false);
+            stop.setTextColor(getResources().getColor(R.color.gray));
+        } else {
+            start.setEnabled(false);
+            start.setTextColor(getResources().getColor(R.color.gray));
+            stop.setEnabled(true);
+            stop.setBackground(getResources().getDrawable(R.drawable.button_style_up));
+        }
     }
 
     private void showWearableNotConnected() {
@@ -235,13 +349,13 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
         MessageApi.SendMessageResult result = Wearable.MessageApi.sendMessage(mGoogleApiClient, nodeId, variable, null).await();
         if (result.getStatus().isSuccess()) {
             if (variable.equals(Variables.START)) {
-                isStopEnabled = true;
+                serviceStarted = true;
             } else if (variable.equals(Variables.STOP)) {
-                isStopEnabled = false;
+                serviceStarted = false;
             }
         } else {
             Log.e(tag, "Failed to send the Message: " + variable);
-            isStopEnabled = true;
+            serviceStarted = true;
         }
     }
 

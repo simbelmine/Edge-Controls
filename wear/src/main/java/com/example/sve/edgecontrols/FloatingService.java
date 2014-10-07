@@ -46,6 +46,7 @@ public class FloatingService extends Service {
     private SharedPreferences localSharedPrefs;
     private Context context;
     private String tag = "edge.brightness.floating";
+    private boolean viewsAddedToWM = false;
 
 
     @Override
@@ -87,11 +88,15 @@ public class FloatingService extends Service {
             updateViewsVisibilities();
         }
 
-        windowManager.addView(tv, paramsTextView);
-        windowManager.addView(middleLeftView, left_params);
-        windowManager.addView(upLeftCornerView, upLeft_params);
-        windowManager.addView(downLeftCornerView, downLeft_params);
-        windowManager.addView(rightView, right_params);
+        if (!viewsAddedToWM) {
+            windowManager.addView(tv, paramsTextView);
+            windowManager.addView(middleLeftView, left_params);
+            windowManager.addView(upLeftCornerView, upLeft_params);
+            windowManager.addView(downLeftCornerView, downLeft_params);
+            windowManager.addView(rightView, right_params);
+
+            viewsAddedToWM = true;
+        }
 
         return Service.START_NOT_STICKY;
     }

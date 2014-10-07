@@ -93,9 +93,11 @@ public class StartUpNotificationListenerService extends WearableListenerService 
         else if (messagePath.equals(Variables.START)) {
             Log.e(tag, "*********************** Message is received on Wear *****************************");
             startService(serviceIntent);
+            sendMessageToPhone("STARTED");
         }
         else if (messagePath.equals(Variables.STOP)) {
             stopService(serviceIntent);
+            sendMessageToPhone("STOPPED");
         }
         else {
             edgeStatus = getEdgeStatusIfCompatible(messagePath);

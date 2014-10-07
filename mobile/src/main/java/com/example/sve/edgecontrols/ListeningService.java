@@ -1,5 +1,6 @@
 package com.example.sve.edgecontrols;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
 
@@ -27,6 +28,18 @@ public class ListeningService extends WearableListenerService {
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean("isReceived", isReceived);
             editor.commit();
+        }
+        if ("STARTED".equals(messagePath)) {
+            Intent intent = new Intent();
+            intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
+            intent.setAction("com.edgecontrols.receiver.STARTED");
+            sendBroadcast(intent);
+        }
+        if ("STOPPED".equals(messagePath)) {
+            Intent intent = new Intent();
+            intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
+            intent.setAction("com.edgecontrols.receiver.STOPPED");
+            sendBroadcast(intent);
         }
         else {
             Log.e(tag, "####### NOT RECEIVED.... :(");
