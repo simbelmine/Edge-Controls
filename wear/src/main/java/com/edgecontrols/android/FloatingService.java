@@ -1,4 +1,4 @@
-package com.example.sve.edgecontrols;
+package com.edgecontrols.android;
 
 import android.app.Service;
 import android.content.Context;
@@ -18,6 +18,7 @@ import android.view.WindowManager;
 import android.widget.TextView;
 
 
+import com.example.sve.edgecontrols.R;
 import com.example.sve.module.Variables;
 
 import java.util.Set;

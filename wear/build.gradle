@@ -6,7 +6,7 @@ android {
     buildToolsVersion "19.1.0"
 
     defaultConfig {
-        applicationId "com.example.sve.edgecontrols"
+        applicationId "com.edgecontrols.android"
         minSdkVersion 20
         targetSdkVersion 20
         versionCode 1
