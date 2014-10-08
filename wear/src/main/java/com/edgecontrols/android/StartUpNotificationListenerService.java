@@ -85,11 +85,9 @@ public class StartUpNotificationListenerService extends WearableListenerService 
 
         serviceIntent = new Intent(this, FloatingService.class);
         String messagePath = messageEvent.getPath();
+        Log.e(tag, "******************===== Message Path ======*********************** = " + messagePath);
 
-        if(messagePath.equals("DUMMY")) {
-            onWearableConnected();
-        }
-        else if (messagePath.equals(Variables.START)) {
+        if (messagePath.equals(Variables.START)) {
             Log.e(tag, "*********************** START (on WEAR) *****************************");
             startService(serviceIntent);
             //sendMessageToPhone("STARTED");

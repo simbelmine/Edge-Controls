@@ -30,6 +30,7 @@ public class SettingsActivity extends Activity {
 
     private String nodeId;
     private SharedPreferences sharedPreferences;
+    public static final String tag = "edgecontrols.brightness";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,11 +132,11 @@ public class SettingsActivity extends Activity {
     }
 
     private void sendUpdateMessageToWear(final String variable) {
-        if (!mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.connect();
-        }
+//        if (!mGoogleApiClient.isConnected()) {
+//            mGoogleApiClient.connect();
+//        }
 
-        sharedPreferences = getSharedPreferences("MyPrefs", 0);
+        sharedPreferences = getSharedPreferences("MyMobilePrefs", 0);
         nodeId = sharedPreferences.getString("nodeId","");
         Log.e("TAG", "------- nodeId = " + nodeId);
 
