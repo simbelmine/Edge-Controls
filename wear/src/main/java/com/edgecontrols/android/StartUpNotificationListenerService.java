@@ -35,13 +35,15 @@ public class StartUpNotificationListenerService extends WearableListenerService 
     private GoogleApiClient googleApiClient;
     private List<Node> connectedNodes;
     private int numWearables;
+    private boolean isStarted = false;
+    private String wearPreferences = "MyWearPrefs";
 
     @Override
     public void onCreate() {
         super.onCreate();
         fillEdgesList();
 
-        sharedPreferences = getSharedPreferences("MyWearPrefs", 0);
+        sharedPreferences = getSharedPreferences(wearPreferences, 0);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putStringSet("edgeStatusList", edgeStatusList);
         editor.commit();
@@ -90,12 +92,14 @@ public class StartUpNotificationListenerService extends WearableListenerService 
         if (messagePath.equals(Variables.START)) {
             Log.e(tag, "*********************** START (on WEAR) *****************************");
             startService(serviceIntent);
-            //sendMessageToPhone("STARTED");
-            onWearableConnected();
+            sendMessageOnWearableConnected();
+            isStarted = true;
+            saveFlagToPreferences();
         }
         else if (messagePath.equals(Variables.STOP)) {
             stopService(serviceIntent);
-            sendMessageToPhone("STOPPED");
+            isStarted = false;
+            saveFlagToPreferences();
         }
         else {
             edgeStatus = getEdgeStatusIfCompatible(messagePath);
@@ -107,11 +111,15 @@ public class StartUpNotificationListenerService extends WearableListenerService 
         super.onMessageReceived(messageEvent);
     }
 
+    private void saveFlagToPreferences() {
+        SharedPreferences wearSharedPreferences= getSharedPreferences(wearPreferences, 0);
+        SharedPreferences.Editor editor = wearSharedPreferences.edit();
+        editor.putBoolean("isStarted", isStarted);
+        editor.commit();
+    }
 
 
-
-
-    private void onWearableConnected() {
+    private void sendMessageOnWearableConnected() {
         connectedNodes = new ArrayList<Node>();
         Wearable.NodeApi.getConnectedNodes(googleApiClient).setResultCallback(new ResultCallback<NodeApi.GetConnectedNodesResult>() {
             @Override
