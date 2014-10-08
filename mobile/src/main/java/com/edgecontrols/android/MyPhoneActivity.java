@@ -30,10 +30,11 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
     private GoogleApiClient mGoogleApiClient;
     private List<Node> connectedNodes;
     private Button settings;
-    private Button start;
-    private Button stop;
+    private Button startBtn;
+    private Button stopBtn;
 
     public static final String tag = "edgecontrols.brightness";
+    private String myMobilePrefs = "MyMobilePrefs";
 
     private int numWearables;
     private String nodeId;
@@ -120,6 +121,7 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
                 .build();
 
         initializeViews();
+        getCurrentServiceStatus();
 
         if (!serviceStarted) {
             StarterThread thread = new StarterThread();
@@ -129,6 +131,17 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
 
 
         Log.v(tag, "onCreate ..........................");
+    }
+
+    private void getCurrentServiceStatus() {
+        sharedPreferences = getSharedPreferences(myMobilePrefs, 0);
+        connected = sharedPreferences.getBoolean("connected", connected);
+        serviceStarted = sharedPreferences.getBoolean("serviceStarted", serviceStarted);
+        isStopPressed = sharedPreferences.getBoolean("isStopPressed", isStopPressed);
+        stopThread = sharedPreferences.getBoolean("stopThread", stopThread);
+
+        Log.e(tag, "******** onCreate ******* connected = " + connected);
+        Log.e(tag, "******** onCreate ******* serviceStarted = " + serviceStarted);
     }
 
     private void registerStartedBroadcastReceiver() {
@@ -215,16 +228,22 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
             mGoogleApiClient.disconnect();
         }
 
-        saveServiceStarted(false);
+        saveServiceStarted();
 
         super.onStop();
     }
 
-    private void saveServiceStarted(boolean b) {
-        SharedPreferences sharedPreferences = getSharedPreferences("MyMobilePrefs", 0);
+    private void saveServiceStarted() {
+        SharedPreferences sharedPreferences = getSharedPreferences(myMobilePrefs, 0);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean("serviceStarted", serviceStarted);
+        editor.putBoolean("connected", connected);
+        editor.putBoolean("isStopPressed", isStopPressed);
+        editor.putBoolean("stopThread", stopThread);
         editor.commit();
+
+        Log.e(tag, "******** onCreate ******* connected = " + sharedPreferences.getBoolean("connected",connected));
+        Log.e(tag, "******** onCreate ******* serviceStarted = " + sharedPreferences.getBoolean("serviceStarted",serviceStarted));
     }
 
     private void saveNodes() {
@@ -235,7 +254,7 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
         if (isWearableConnected) {
             nodeId = connectedNodesResult.getNodes().get(0).getId();
 
-            sharedPreferences = getSharedPreferences("MyMobilePrefs", 0);
+            sharedPreferences = getSharedPreferences(myMobilePrefs, 0);
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString("nodeId", nodeId);
             editor.putInt("numWearables", numWearables);
@@ -275,19 +294,19 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
             }
         });
 
-        start = (Button) findViewById(R.id.start_btn);
-        stop = (Button) findViewById(R.id.stop_btn);
+        startBtn = (Button) findViewById(R.id.start_btn);
+        stopBtn = (Button) findViewById(R.id.stop_btn);
 
         updateStartStopButtons();
 
-        start.setOnClickListener(new View.OnClickListener() {
+        startBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 sendMessageToWear(Variables.START);
             }
         });
 
-        stop.setOnClickListener(new View.OnClickListener() {
+        stopBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 sendMessageToWear(Variables.STOP);
@@ -298,19 +317,19 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
     private void updateStartStopButtons() {
         if (!serviceStarted || isStopPressed) {
             if (!stopThread) {
-                start.setEnabled(false);
-                start.setText("Starting...");
+                startBtn.setEnabled(false);
+                startBtn.setText("Starting...");
             } else {
-                start.setEnabled(true);
-                start.setBackground(getResources().getDrawable(R.drawable.button_style_up));
+                startBtn.setEnabled(true);
+                startBtn.setBackground(getResources().getDrawable(R.drawable.button_style_up));
             }
-            stop.setEnabled(false);
-            stop.setTextColor(getResources().getColor(R.color.gray));
+            stopBtn.setEnabled(false);
+            stopBtn.setTextColor(getResources().getColor(R.color.gray));
         } else if(!isStopPressed){
-            start.setEnabled(false);
-            start.setTextColor(getResources().getColor(R.color.gray));
-            stop.setEnabled(true);
-            stop.setBackground(getResources().getDrawable(R.drawable.button_style_up));
+            startBtn.setEnabled(false);
+            startBtn.setTextColor(getResources().getColor(R.color.gray));
+            stopBtn.setEnabled(true);
+            stopBtn.setBackground(getResources().getDrawable(R.drawable.button_style_up));
         }
     }
 
@@ -368,7 +387,7 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
     }
 
     private boolean isReceived() {
-        sharedPreferences = getSharedPreferences("MyMobilePrefs", 0);
+        sharedPreferences = getSharedPreferences(myMobilePrefs, 0);
         if(sharedPreferences.getBoolean("isReceived", false)) {
             return true;
         }
