@@ -20,14 +20,6 @@ public class ListeningService extends WearableListenerService {
     public void onMessageReceived(MessageEvent messageEvent) {
         String messagePath = messageEvent.getPath();
 
-        if(messagePath.equals("DUMMY")) {
-            isReceived = true;
-
-            sharedPreferences = getSharedPreferences("MyMobilePrefs", 0);
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putBoolean("isReceived", isReceived);
-            editor.commit();
-        }
         if ("STARTED".equals(messagePath)) {
             Intent intent = new Intent();
             intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);

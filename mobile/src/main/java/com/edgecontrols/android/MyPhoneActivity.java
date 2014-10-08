@@ -70,7 +70,7 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
                     stopThread = true;
                 }
                 updateButtons();
-                slowDown(3000);
+                slowDown(5000);
             }
         }
 
