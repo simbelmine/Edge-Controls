@@ -16,7 +16,7 @@
             android:layout_centerInParent="true"
             android:layout_marginLeft="10dip"
             android:layout_marginRight="10dip"
-            android:src="@drawable/empty_screen"/>
+            android:src="@drawable/empty_screen_new"/>
         <View
             android:id="@+id/up_left_corner"
             android:layout_width="25dip"
