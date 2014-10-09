@@ -30,6 +30,7 @@ public class SettingsActivity extends Activity {
 
     private String nodeId;
     private SharedPreferences sharedPreferences;
+    private String mobilePrefs = "MyMobilePrefs";
     public static final String tag = "edgecontrols.brightness";
 
     @Override
@@ -41,71 +42,85 @@ public class SettingsActivity extends Activity {
                 .addApi(Wearable.API)
                 .build();
 
-        upLeft_clicked = false;
-        middleLeft_clicked = false;
-        downLeft_clicked = false;
-        right_clicked = true;
         settings_img = (ImageView) findViewById(R.id.settings_img);
         upLeftView = findViewById(R.id.up_left_corner);
         middleLeftView = findViewById(R.id.middle_left);
         downLeftView = findViewById(R.id.down_left_corner);
         rightView = findViewById(R.id.middle_right);
 
+        updateFlagsFromPreferences();
+        updateViewColor();
+
         upLeftView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                changeViewColor(upLeftView, upLeft_clicked);
-                if(!upLeft_clicked) {
+                if(upLeft_clicked) {
                     sendUpdateMessageToWear(Variables.UPLEFTVISIBLE);
                 }
                 else {
                     sendUpdateMessageToWear(Variables.UPLEFTGONE);
                 }
                 upLeft_clicked = getNewFlag(upLeft_clicked);
+                changeViewColor(upLeftView, upLeft_clicked);
             }
         });
 
         middleLeftView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                changeViewColor(middleLeftView, middleLeft_clicked);
-                if(!middleLeft_clicked) {
+                if(middleLeft_clicked) {
                     sendUpdateMessageToWear(Variables.MIDDLELEFTVISIBLE);
                 }
                 else {
                     sendUpdateMessageToWear(Variables.MIDDLELEFTGONE);
                 }
                 middleLeft_clicked = getNewFlag(middleLeft_clicked);
+                changeViewColor(middleLeftView, middleLeft_clicked);
             }
         });
 
         downLeftView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                changeViewColor(downLeftView, downLeft_clicked);
-                if(!downLeft_clicked) {
+                if(downLeft_clicked) {
                     sendUpdateMessageToWear(Variables.DOWNLEFTVISIBLE);
                 }
                 else {
                     sendUpdateMessageToWear(Variables.DOWNLEFTGONE);
                 }
                 downLeft_clicked = getNewFlag(downLeft_clicked);
+                changeViewColor(downLeftView, downLeft_clicked);
             }
         });
 
         rightView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                changeViewColor(rightView, right_clicked);
-                if(!right_clicked) {
+                if(right_clicked) {
                     sendUpdateMessageToWear(Variables.RIGHTVISIBLE);
                 }
                 else {
                     sendUpdateMessageToWear(Variables.RIGHTGONE);
                 }
                 right_clicked = getNewFlag(right_clicked);
+                changeViewColor(rightView, right_clicked);
             }
         });
+    }
+
+    private void updateViewColor() {
+        changeViewColor(upLeftView, upLeft_clicked);
+        changeViewColor(middleLeftView, middleLeft_clicked);
+        changeViewColor(downLeftView, downLeft_clicked);
+        changeViewColor(rightView, right_clicked);
+    }
+
+    private void updateFlagsFromPreferences() {
+        SharedPreferences sharedPrefs = getSharedPreferences(mobilePrefs, 0);
+        upLeft_clicked = sharedPrefs.getBoolean("upLeft_clicked", true);
+        middleLeft_clicked = sharedPrefs.getBoolean("middleLeft_clicked", true);
+        downLeft_clicked = sharedPrefs.getBoolean("downLeft_clicked", true);
+        right_clicked = sharedPrefs.getBoolean("right_clicked", false);
     }
 
     @Override
@@ -119,7 +134,18 @@ public class SettingsActivity extends Activity {
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
+        saveFlagsToPreferences();
         super.onStop();
+    }
+
+    private void saveFlagsToPreferences() {
+        SharedPreferences sharedPrefs = getSharedPreferences(mobilePrefs, 0);
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        editor.putBoolean("upLeft_clicked", upLeft_clicked);
+        editor.putBoolean("middleLeft_clicked", middleLeft_clicked);
+        editor.putBoolean("downLeft_clicked", downLeft_clicked);
+        editor.putBoolean("right_clicked", right_clicked);
+        editor.commit();
     }
 
     private void changeViewColor(View view, boolean flag) {
@@ -136,7 +162,7 @@ public class SettingsActivity extends Activity {
 //            mGoogleApiClient.connect();
 //        }
 
-        sharedPreferences = getSharedPreferences("MyMobilePrefs", 0);
+        sharedPreferences = getSharedPreferences(mobilePrefs, 0);
         nodeId = sharedPreferences.getString("nodeId","");
         Log.e("TAG", "------- nodeId = " + nodeId);
 
