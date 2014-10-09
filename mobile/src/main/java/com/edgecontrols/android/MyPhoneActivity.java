@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.sve.edgecontrols.R;
@@ -32,6 +33,7 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
     private Button settings;
     private Button startBtn;
     private Button stopBtn;
+    private ImageView imageView;
 
     public static final String tag = "edgecontrols.brightness";
     private String myMobilePrefs = "MyMobilePrefs";
@@ -285,12 +287,19 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
         Log.e(tag, "Init the MAIN view ........");
         setContentView(R.layout.main);
 
+        imageView = (ImageView) findViewById(R.id.image);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startSettingsActivity();
+            }
+        });
+
         settings = (Button) findViewById(R.id.settings);
         settings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MyPhoneActivity.this, SettingsActivity.class);
-                startActivity(intent);
+               startSettingsActivity();
             }
         });
 
@@ -312,6 +321,11 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
                 sendMessageToWear(Variables.STOP);
             }
         });
+    }
+
+    private void startSettingsActivity() {
+        Intent intent = new Intent(MyPhoneActivity.this, SettingsActivity.class);
+        startActivity(intent);
     }
 
     private void updateStartStopButtons() {
