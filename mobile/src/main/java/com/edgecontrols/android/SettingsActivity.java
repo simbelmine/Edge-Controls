@@ -50,69 +50,7 @@ public class SettingsActivity extends Activity {
 
         updateFlagsFromPreferences();
         updateViewColor();
-
-        upLeftView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(upLeft_clicked) {
-                    sendUpdateMessageToWear(Variables.UPLEFTVISIBLE);
-                }
-                else {
-                    sendUpdateMessageToWear(Variables.UPLEFTGONE);
-                }
-                upLeft_clicked = getNewFlag(upLeft_clicked);
-                changeViewColor(upLeftView, upLeft_clicked);
-            }
-        });
-
-        middleLeftView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(middleLeft_clicked) {
-                    sendUpdateMessageToWear(Variables.MIDDLELEFTVISIBLE);
-                }
-                else {
-                    sendUpdateMessageToWear(Variables.MIDDLELEFTGONE);
-                }
-                middleLeft_clicked = getNewFlag(middleLeft_clicked);
-                changeViewColor(middleLeftView, middleLeft_clicked);
-            }
-        });
-
-        downLeftView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(downLeft_clicked) {
-                    sendUpdateMessageToWear(Variables.DOWNLEFTVISIBLE);
-                }
-                else {
-                    sendUpdateMessageToWear(Variables.DOWNLEFTGONE);
-                }
-                downLeft_clicked = getNewFlag(downLeft_clicked);
-                changeViewColor(downLeftView, downLeft_clicked);
-            }
-        });
-
-        rightView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(right_clicked) {
-                    sendUpdateMessageToWear(Variables.RIGHTVISIBLE);
-                }
-                else {
-                    sendUpdateMessageToWear(Variables.RIGHTGONE);
-                }
-                right_clicked = getNewFlag(right_clicked);
-                changeViewColor(rightView, right_clicked);
-            }
-        });
-    }
-
-    private void updateViewColor() {
-        changeViewColor(upLeftView, upLeft_clicked);
-        changeViewColor(middleLeftView, middleLeft_clicked);
-        changeViewColor(downLeftView, downLeft_clicked);
-        changeViewColor(rightView, right_clicked);
+        setViewsClickListener();
     }
 
     private void updateFlagsFromPreferences() {
@@ -121,6 +59,13 @@ public class SettingsActivity extends Activity {
         middleLeft_clicked = sharedPrefs.getBoolean("middleLeft_clicked", true);
         downLeft_clicked = sharedPrefs.getBoolean("downLeft_clicked", true);
         right_clicked = sharedPrefs.getBoolean("right_clicked", false);
+    }
+
+    private void updateViewColor() {
+        changeViewColor(upLeftView, upLeft_clicked);
+        changeViewColor(middleLeftView, middleLeft_clicked);
+        changeViewColor(downLeftView, downLeft_clicked);
+        changeViewColor(rightView, right_clicked);
     }
 
     @Override
@@ -186,5 +131,63 @@ public class SettingsActivity extends Activity {
 
     private boolean getNewFlag(boolean flag) {
         return !flag;
+    }
+
+    private void setViewsClickListener() {
+        upLeftView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(upLeft_clicked) {
+                    sendUpdateMessageToWear(Variables.UPLEFTVISIBLE);
+                }
+                else {
+                    sendUpdateMessageToWear(Variables.UPLEFTGONE);
+                }
+                upLeft_clicked = getNewFlag(upLeft_clicked);
+                changeViewColor(upLeftView, upLeft_clicked);
+            }
+        });
+
+        middleLeftView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(middleLeft_clicked) {
+                    sendUpdateMessageToWear(Variables.MIDDLELEFTVISIBLE);
+                }
+                else {
+                    sendUpdateMessageToWear(Variables.MIDDLELEFTGONE);
+                }
+                middleLeft_clicked = getNewFlag(middleLeft_clicked);
+                changeViewColor(middleLeftView, middleLeft_clicked);
+            }
+        });
+
+        downLeftView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(downLeft_clicked) {
+                    sendUpdateMessageToWear(Variables.DOWNLEFTVISIBLE);
+                }
+                else {
+                    sendUpdateMessageToWear(Variables.DOWNLEFTGONE);
+                }
+                downLeft_clicked = getNewFlag(downLeft_clicked);
+                changeViewColor(downLeftView, downLeft_clicked);
+            }
+        });
+
+        rightView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(right_clicked) {
+                    sendUpdateMessageToWear(Variables.RIGHTVISIBLE);
+                }
+                else {
+                    sendUpdateMessageToWear(Variables.RIGHTGONE);
+                }
+                right_clicked = getNewFlag(right_clicked);
+                changeViewColor(rightView, right_clicked);
+            }
+        });
     }
 }

@@ -45,6 +45,8 @@ public class FloatingService extends Service {
     private Set<String> edgesStatusSet;
     private String edgeVisibilityParam;
     private SharedPreferences localSharedPrefs;
+    private String localPrefs = "MyLocalPrefs";
+    private String wearPrefs = "MyWearPrefs";
     private Context context;
     private static final String tag = "edge.brightness.wearable.listener";
     private boolean viewsAddedToWM = false;
@@ -60,7 +62,7 @@ public class FloatingService extends Service {
         //super.onCreate();
 
         context = getApplicationContext();
-        localSharedPrefs = context.getSharedPreferences("MyLocalPrefs", 0);
+        localSharedPrefs = context.getSharedPreferences(localPrefs, 0);
 
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
 
@@ -69,7 +71,7 @@ public class FloatingService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        SharedPreferences sharedPreferences = getSharedPreferences("MyWearPrefs", 0);
+        SharedPreferences sharedPreferences = getSharedPreferences(wearPrefs, 0);
         edgesStatusSet = sharedPreferences.getStringSet("edgeStatusList", null);
 
         if (edgesStatusSet != null) {
@@ -77,10 +79,7 @@ public class FloatingService extends Service {
         }
 
         Log.e(tag, "******** EDGE status = " + edgeVisibilityParam + "***************");
-//        Log.e("TAG", "************** SHARED PREFS = " + String.valueOf(localSharedPrefs.getInt("upLeft",11)) + "  " +
-//                String.valueOf(localSharedPrefs.getInt("middLeft",11)) + "  " +
-//                String.valueOf(localSharedPrefs.getInt("downLeft",11)) + "  " +
-//                String.valueOf(localSharedPrefs.getInt("right",11)));
+
         if(edgeVisibilityParam != null) {
             setEdgeVisibility();
             updateViewsVisibilities();
@@ -124,11 +123,6 @@ public class FloatingService extends Service {
         changeViewVisibility(middleLeft, middleLeftView);
         changeViewVisibility(downLeft, downLeftCornerView);
         changeViewVisibility(right, rightView);
-
-//        Log.e("TAG", "------------- shared preferences = " + String.valueOf(localSharedPrefs.getInt("upLeft",11)) + "  " +
-//                String.valueOf(localSharedPrefs.getInt("middLeft",11)) + "  " +
-//                String.valueOf(localSharedPrefs.getInt("downLeft",11)) + "  " +
-//                String.valueOf(localSharedPrefs.getInt("right",11)));
     }
 
     private void changeViewVisibility(boolean active, CustomView view) {
@@ -153,7 +147,7 @@ public class FloatingService extends Service {
     }
 
     private void save(String controlName, boolean active) {
-        localSharedPrefs = context.getSharedPreferences("MyLocalPrefs", 0);
+        localSharedPrefs = context.getSharedPreferences(localPrefs, 0);
         SharedPreferences.Editor editor = localSharedPrefs.edit();
         editor.putBoolean(controlName, active);
         editor.commit();
@@ -180,10 +174,6 @@ public class FloatingService extends Service {
         } else if (edgeVisibilityParam.equals(Variables.RIGHTGONE)) {
             saveRight(false);
         }
-//        Log.e("TAG", "------------- shared preferences = " + localSharedPrefs.getBoolean("upLeft", 11) + "  " +
-//                String.valueOf(localSharedPrefs.getInt("middLeft", 11)) + "  " +
-//                String.valueOf(localSharedPrefs.getInt("downLeft", 11)) + "  " +
-//                String.valueOf(localSharedPrefs.getInt("right", 11)));
 
         updateViewsVisibilities();
     }
