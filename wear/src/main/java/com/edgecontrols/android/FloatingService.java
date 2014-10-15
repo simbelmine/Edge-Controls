@@ -51,6 +51,7 @@ public class FloatingService extends Service {
     private static final String tag = "edge.brightness.wearable.listener";
     private boolean viewsAddedToWM = false;
 
+    private int viewWidth = 28;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -234,7 +235,7 @@ public class FloatingService extends Service {
         left_params.gravity = Gravity.LEFT | Gravity.CENTER_HORIZONTAL;
         left_params.x = 0;
         left_params.y = 0;
-        left_params.width = 25;
+        left_params.width = viewWidth;
         left_params.height = getDisplayHeight(windowManager)/2; // WHOLE SCREEEN (if HALF divide by 2)
 
         final GestureDetector myGesture = new GestureDetector(this,
@@ -269,7 +270,7 @@ public class FloatingService extends Service {
         upLeft_params.gravity = Gravity.LEFT | Gravity.TOP;
         upLeft_params.x = 0;
         upLeft_params.y = 0;
-        upLeft_params.width = 25;
+        upLeft_params.width = viewWidth;
         upLeft_params.height = getDisplayHeight(windowManager)/4;
 
         final GestureDetector myUpLeftGesture = new GestureDetector(this,
@@ -304,7 +305,7 @@ public class FloatingService extends Service {
         downLeft_params.gravity = Gravity.LEFT | Gravity.BOTTOM;
         downLeft_params.x = 0;
         downLeft_params.y = 0;
-        downLeft_params.width = 25;
+        downLeft_params.width = viewWidth;
         downLeft_params.height = getDisplayHeight(windowManager)/4;
 
         final GestureDetector myDownLeftGesture = new GestureDetector(this,
@@ -339,7 +340,7 @@ public class FloatingService extends Service {
         right_params.gravity = Gravity.RIGHT | Gravity.CENTER_HORIZONTAL;
         right_params.x = 0;
         right_params.y = 0;
-        right_params.width = 25;
+        right_params.width = viewWidth;
         right_params.height = getDisplayHeight(windowManager);
 
         final GestureDetector myRightGesture = new GestureDetector(this,
