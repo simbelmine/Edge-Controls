@@ -46,6 +46,7 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
     boolean stopThread = false;
     boolean connected = false;
     boolean isStopPressed = false;
+    private int numMessages = 0;
 
     private Object lock = new Object();
 
@@ -71,8 +72,10 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
                 } else {
                     stopThread = true;
                 }
+                numMessages++;
+                stopThreadBeforeEnd();
                 updateButtons();
-                slowDown(5000);
+                slowDown(3000);
             }
         }
 
@@ -101,6 +104,12 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
                     updateStartStopButtons();
                 }
             });
+        }
+
+        private void stopThreadBeforeEnd() {
+            if(numMessages >= 3) {
+                stopThread = true;
+            }
         }
     }
 
