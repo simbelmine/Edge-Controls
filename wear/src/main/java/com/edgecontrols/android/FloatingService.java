@@ -223,7 +223,7 @@ public class FloatingService extends Service {
         ////////// *** Left Middle View *** //////////
         //////////////////////////////////////////////
         middleLeftView = new CustomView(this, tv);
-        middleLeftView.setBackgroundColor(getResources().getColor(R.color.light_blue));
+        //middleLeftView.setBackgroundColor(getResources().getColor(R.color.light_blue));
         left_params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT,
@@ -258,7 +258,7 @@ public class FloatingService extends Service {
         ////////// *** Left Up View *** //////////
         //////////////////////////////////////////////
         upLeftCornerView = new CustomView(this, tv);
-        upLeftCornerView.setBackgroundColor(getResources().getColor(R.color.light_blue));
+        //upLeftCornerView.setBackgroundColor(getResources().getColor(R.color.light_blue));
         upLeft_params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT,
@@ -293,7 +293,7 @@ public class FloatingService extends Service {
         ////////// *** Left Down View *** //////////
         //////////////////////////////////////////////
         downLeftCornerView = new CustomView(this, tv);
-        downLeftCornerView.setBackgroundColor(getResources().getColor(R.color.light_blue));
+        //downLeftCornerView.setBackgroundColor(getResources().getColor(R.color.light_blue));
         downLeft_params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT,
@@ -328,7 +328,7 @@ public class FloatingService extends Service {
         ////////// *** Right View *** //////////
         //////////////////////////////////////////////
         rightView = new CustomView(this, tv);
-        rightView.setBackgroundColor(getResources().getColor(R.color.light_blue));
+        //rightView.setBackgroundColor(getResources().getColor(R.color.light_blue));
         right_params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT,
