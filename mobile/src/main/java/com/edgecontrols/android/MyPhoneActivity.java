@@ -424,6 +424,7 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-
+        Log.e(tag, "onConnectionFailed....");
+        showWearableNotConnected();
     }
 }
