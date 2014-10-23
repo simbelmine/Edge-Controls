@@ -21,6 +21,7 @@
 
         <activity
             android:name="com.edgecontrols.android.MyPhoneActivity"
+            android:screenOrientation="portrait"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -29,7 +30,8 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.edgecontrols.android.SettingsActivity"/>
+        <activity android:name="com.edgecontrols.android.SettingsActivity"
+                  android:screenOrientation="portrait"/>
 
         <service android:name="com.edgecontrols.android.ListeningService"
             android:enabled="true"
