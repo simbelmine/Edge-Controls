@@ -55,7 +55,7 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
         public void run() {
             super.run();
 
-            updateButtons();
+
 
             if (!connected) {
                 Log.v(tag, "thread waits for connection!");
@@ -64,6 +64,7 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
             Log.v(tag, "thread notified for connection!");
 
             slowDown(5000);
+            updateButtons();
 
             while (!stopThread) {
                 Log.v(tag, "trying to start the service.... " + serviceStarted);
@@ -131,7 +132,7 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
                 .addOnConnectionFailedListener(this)
                 .build();
 
-        initializeViews();
+        //initializeViews();
         getCurrentServiceStatus();
 
         if (!serviceStarted) {
