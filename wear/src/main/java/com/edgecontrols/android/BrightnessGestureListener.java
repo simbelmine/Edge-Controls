@@ -34,8 +34,6 @@ public class BrightnessGestureListener implements GestureDetector.OnGestureListe
         MIN_DIST = viewHeight / 10;
     }
 
-
-
     @Override
     public boolean onDown(MotionEvent e) {
         initialBrightness = brightness;
@@ -45,14 +43,13 @@ public class BrightnessGestureListener implements GestureDetector.OnGestureListe
 
     @Override
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-
-
         return false;
     }
 
     @Override
     public void onLongPress(MotionEvent e) {
-
+        putAutoBrightness();
+        view.indicator.setText("Auto Mode");
     }
 
     @Override
@@ -113,6 +110,18 @@ public class BrightnessGestureListener implements GestureDetector.OnGestureListe
         }
         catch(Settings.SettingNotFoundException ex) {
             Log.e("Exception", "Cannot read Brightness Mode  " + ex);
+        }
+    }
+
+    private void putAutoBrightness() {
+        try {
+            int autoMode = Settings.System.getInt(cntx.getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE);
+            if(autoMode != 1) {
+                Settings.System.putInt(cntx.getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC);
+            }
+        }
+        catch (Settings.SettingNotFoundException ex) {
+            Log.e("Exception","Cannot read Brightness Mode  " + ex);
         }
     }
 
