@@ -63,8 +63,8 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
             }
             Log.v(tag, "thread notified for connection!");
 
-            slowDown(5000);
             updateButtons();
+            slowDown(5000);
 
             while (!stopThread) {
                 Log.v(tag, "trying to start the service.... " + serviceStarted);
@@ -240,12 +240,12 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
             mGoogleApiClient.disconnect();
         }
 
-        saveServiceStarted();
+        saveServiceStatus();
 
         super.onStop();
     }
 
-    private void saveServiceStarted() {
+    private void saveServiceStatus() {
         SharedPreferences sharedPreferences = getSharedPreferences(myMobilePrefs, 0);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean("serviceStarted", serviceStarted);
@@ -321,7 +321,14 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
         startBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendMessageToWear(Variables.START);
+                //sendMessageToWear(Variables.START);
+                serviceStarted = false;
+                stopThread = false;
+
+                if (!serviceStarted) {
+                    StarterThread thread = new StarterThread();
+                    thread.start();
+                }
             }
         });
 
