@@ -22,11 +22,16 @@ public class SettingsActivity extends Activity {
     private View upLeftView;
     private View middleLeftView;
     private View downLeftView;
+    private View upRightView;
     private View rightView;
+    private View downRightView;
+
     private boolean upLeft_clicked;
     private boolean middleLeft_clicked;
     private boolean downLeft_clicked;
+    private boolean upRight_clicked;
     private boolean right_clicked;
+    private boolean downRight_clicked;
 
     private String nodeId;
     private SharedPreferences sharedPreferences;
@@ -46,7 +51,9 @@ public class SettingsActivity extends Activity {
         upLeftView = findViewById(R.id.up_left_corner);
         middleLeftView = findViewById(R.id.middle_left);
         downLeftView = findViewById(R.id.down_left_corner);
+        upRightView =findViewById(R.id.up_right_corner);
         rightView = findViewById(R.id.middle_right);
+        downRightView = findViewById(R.id.down_right_corner);
 
         updateFlagsFromPreferences();
         updateViewColor();
@@ -58,14 +65,18 @@ public class SettingsActivity extends Activity {
         upLeft_clicked = sharedPrefs.getBoolean("upLeft_clicked", true);
         middleLeft_clicked = sharedPrefs.getBoolean("middleLeft_clicked", true);
         downLeft_clicked = sharedPrefs.getBoolean("downLeft_clicked", true);
+        upRight_clicked = sharedPrefs.getBoolean("upRight_clicked", true);
         right_clicked = sharedPrefs.getBoolean("right_clicked", false);
+        downRight_clicked = sharedPrefs.getBoolean("downRight_clicked", true);
     }
 
     private void updateViewColor() {
         changeViewColor(upLeftView, upLeft_clicked);
         changeViewColor(middleLeftView, middleLeft_clicked);
         changeViewColor(downLeftView, downLeft_clicked);
+        changeViewColor(upRightView, upRight_clicked);
         changeViewColor(rightView, right_clicked);
+        changeViewColor(downRightView, downRight_clicked);
     }
 
     @Override
@@ -89,7 +100,9 @@ public class SettingsActivity extends Activity {
         editor.putBoolean("upLeft_clicked", upLeft_clicked);
         editor.putBoolean("middleLeft_clicked", middleLeft_clicked);
         editor.putBoolean("downLeft_clicked", downLeft_clicked);
+        editor.putBoolean("upRight_clicked", upRight_clicked);
         editor.putBoolean("right_clicked", right_clicked);
+        editor.putBoolean("downRight_clicked", downRight_clicked);
         editor.commit();
     }
 
@@ -176,6 +189,20 @@ public class SettingsActivity extends Activity {
             }
         });
 
+        upRightView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(upRight_clicked) {
+                    sendUpdateMessageToWear(Variables.UPRIGHTVISIBLE);
+                }
+                else {
+                    sendUpdateMessageToWear(Variables.UPRIGHTGONE);
+                }
+                upRight_clicked = getNewFlag(upRight_clicked);
+                changeViewColor(upRightView, upRight_clicked);
+            }
+        });
+
         rightView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -187,6 +214,20 @@ public class SettingsActivity extends Activity {
                 }
                 right_clicked = getNewFlag(right_clicked);
                 changeViewColor(rightView, right_clicked);
+            }
+        });
+
+        downRightView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(downRight_clicked) {
+                    sendUpdateMessageToWear(Variables.DOWNRIGHTVISIBLE);
+                }
+                else {
+                    sendUpdateMessageToWear(Variables.DOWNRIGHTGONE);
+                }
+                downRight_clicked = getNewFlag(downRight_clicked);
+                changeViewColor(downRightView, downRight_clicked);
             }
         });
     }

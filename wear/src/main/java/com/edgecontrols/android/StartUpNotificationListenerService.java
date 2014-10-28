@@ -69,8 +69,14 @@ public class StartUpNotificationListenerService extends WearableListenerService 
         edgeStatusList.add(Variables.DOWNLEFTVISIBLE);
         edgeStatusList.add(Variables.DOWNLEFTGONE);
 
+        edgeStatusList.add(Variables.UPRIGHTVISIBLE);
+        edgeStatusList.add(Variables.UPRIGHTGONE);
+
         edgeStatusList.add(Variables.RIGHTVISIBLE);
         edgeStatusList.add(Variables.RIGHTGONE);
+
+        edgeStatusList.add(Variables.DOWNRIGHTVISIBLE);
+        edgeStatusList.add(Variables.DOWNRIGHTGONE);
     }
 
     @Override

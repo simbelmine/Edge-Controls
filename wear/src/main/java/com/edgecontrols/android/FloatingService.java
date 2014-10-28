@@ -28,7 +28,9 @@ import java.util.Set;
  */
 public class FloatingService extends Service {
     private WindowManager windowManager;
+    private CustomView upRightCornerView;
     private CustomView rightView;
+    private CustomView downRightCornerView;
     private CustomView upLeftCornerView;
     private CustomView middleLeftView;
     private CustomView downLeftCornerView;
@@ -39,6 +41,8 @@ public class FloatingService extends Service {
     private WindowManager.LayoutParams upLeft_params;
     private WindowManager.LayoutParams downLeft_params;
     private WindowManager.LayoutParams right_params;
+    private WindowManager.LayoutParams upRight_params;
+    private WindowManager.LayoutParams downRight_params;
 
     private float brightness = 0;
 
@@ -96,6 +100,8 @@ public class FloatingService extends Service {
             windowManager.addView(upLeftCornerView, upLeft_params);
             windowManager.addView(downLeftCornerView, downLeft_params);
             windowManager.addView(rightView, right_params);
+            windowManager.addView(upRightCornerView, upRight_params);
+            windowManager.addView(downRightCornerView, downRight_params);
 
             viewsAddedToWM = true;
         }
@@ -117,14 +123,18 @@ public class FloatingService extends Service {
         Log.e("TAG", "************** INITIAL ***************");
 
         boolean upLeft = localSharedPrefs.getBoolean("upLeft", false);
-        boolean middleLeft= localSharedPrefs.getBoolean("middleLeft", false);
-        boolean downLeft= localSharedPrefs.getBoolean("downLeft", false);
+        boolean middleLeft = localSharedPrefs.getBoolean("middleLeft", false);
+        boolean downLeft = localSharedPrefs.getBoolean("downLeft", false);
+        boolean upRight = localSharedPrefs.getBoolean("upRight", false);
         boolean right = localSharedPrefs.getBoolean("right", true);
+        boolean downRight = localSharedPrefs.getBoolean("downRight", false);
 
         changeViewVisibility(upLeft, upLeftCornerView);
         changeViewVisibility(middleLeft, middleLeftView);
         changeViewVisibility(downLeft, downLeftCornerView);
+        changeViewVisibility(upRight, upRightCornerView);
         changeViewVisibility(right, rightView);
+        changeViewVisibility(downRight, downRightCornerView);
     }
 
     private void changeViewVisibility(boolean active, CustomView view) {
@@ -144,9 +154,11 @@ public class FloatingService extends Service {
     private void saveDownLeft(boolean active) {
         save("downLeft", active);
     }
+    private void saveUpRight(boolean active) { save("upRight", active); }
     private void saveRight(boolean active) {
         save("right", active);
     }
+    private void saveDownRight(boolean active) { save("downRight", active); }
 
     private void save(String controlName, boolean active) {
         localSharedPrefs = context.getSharedPreferences(localPrefs, 0);
@@ -158,7 +170,6 @@ public class FloatingService extends Service {
     private void setEdgeVisibility() {
         // ***** Switch-Case it's not working for Strings *****//
 
-        // Up - Left
         if (Variables.UPLEFTVISIBLE.equals(edgeVisibilityParam)) {
             saveUpLeft(true);
         } else if (edgeVisibilityParam.equals(Variables.UPLEFTGONE)) {
@@ -171,10 +182,18 @@ public class FloatingService extends Service {
             saveDownLeft(true);
         } else if (edgeVisibilityParam.equals(Variables.DOWNLEFTGONE)) {
             saveDownLeft(false);
+        } else if(edgeVisibilityParam.equals(Variables.UPRIGHTVISIBLE)) {
+            saveUpRight(true);
+        } else if(edgeVisibilityParam.equals(Variables.UPRIGHTGONE)) {
+            saveUpRight(false);
         } else if (edgeVisibilityParam.equals(Variables.RIGHTVISIBLE)) {
             saveRight(true);
         } else if (edgeVisibilityParam.equals(Variables.RIGHTGONE)) {
             saveRight(false);
+        } else if(edgeVisibilityParam.equals(Variables.DOWNRIGHTVISIBLE)) {
+            saveDownRight(true);
+        } else if(edgeVisibilityParam.equals(Variables.DOWNRIGHTGONE)) {
+            saveDownRight(false);
         }
 
         updateViewsVisibilities();
@@ -196,6 +215,8 @@ public class FloatingService extends Service {
         if(upLeftCornerView != null) windowManager.removeViewImmediate(upLeftCornerView);
         if(downLeftCornerView != null) windowManager.removeViewImmediate(downLeftCornerView);
         if(rightView != null) windowManager.removeViewImmediate(rightView);
+        if(upRightCornerView != null) windowManager.removeViewImmediate(upRightCornerView);
+        if(downRightCornerView != null) windowManager.removeViewImmediate(downRightCornerView);
 
         //Toast.makeText(this, "Destroy ...", Toast.LENGTH_LONG).show();
         stopSelf();
@@ -325,10 +346,10 @@ public class FloatingService extends Service {
 
 
         //////////////////////////////////////////////
-        ////////// *** Right View *** //////////
+        ////////// *** Right MIDDLE View *** //////////
         //////////////////////////////////////////////
         rightView = new CustomView(this, tv);
-        //rightView.setBackgroundColor(getResources().getColor(R.color.light_blue));
+        rightView.setBackgroundColor(getResources().getColor(R.color.light_blue));
         right_params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT,
@@ -342,7 +363,7 @@ public class FloatingService extends Service {
         right_params.x = 0;
         right_params.y = 0;
         right_params.width = viewRightWidth;
-        right_params.height = getDisplayHeight(windowManager);
+        right_params.height = getDisplayHeight(windowManager)/2;
 
         final GestureDetector myRightGesture = new GestureDetector(this,
                 new BrightnessGestureListener(this, windowManager, brightness, rightView));
@@ -357,5 +378,77 @@ public class FloatingService extends Service {
             }
         });
         rightView.setClickable(true);
+
+
+        //////////////////////////////////////////////
+        ////////// *** Right Up View *** //////////
+        //////////////////////////////////////////////
+        upRightCornerView = new CustomView(this, tv);
+        upRightCornerView.setBackgroundColor(getResources().getColor(R.color.light_blue));
+        upRight_params = new WindowManager.LayoutParams(
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.TYPE_PHONE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
+                WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                PixelFormat.TRANSLUCENT
+        );
+        upRight_params.gravity = Gravity.RIGHT | Gravity.TOP;
+        upRight_params.x = 0;
+        upRight_params.y = 0;
+        upRight_params.width = viewLeftWidth;
+        upRight_params.height = getDisplayHeight(windowManager)/4;
+
+        final GestureDetector myUpRightGesture = new GestureDetector(this,
+                new BrightnessGestureListener(this, windowManager, brightness, upRightCornerView));
+        upRightCornerView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getActionMasked() == MotionEvent.ACTION_DOWN)
+                    tv.setVisibility(View.VISIBLE);
+                else if(event.getActionMasked() == MotionEvent.ACTION_UP)
+                    tv.setVisibility(View.GONE);
+                return myUpRightGesture.onTouchEvent(event);
+            }
+        });
+        upRightCornerView.setClickable(true);
+
+
+
+        //////////////////////////////////////////////
+        ////////// *** Right Down View *** //////////
+        //////////////////////////////////////////////
+
+        downRightCornerView = new CustomView(this, tv);
+        downRightCornerView.setBackgroundColor(getResources().getColor(R.color.light_blue));
+        downRight_params = new WindowManager.LayoutParams(
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.TYPE_PHONE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
+                WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                PixelFormat.TRANSLUCENT
+        );
+        downRight_params.gravity = Gravity.RIGHT | Gravity.BOTTOM;
+        downRight_params.x = 0;
+        downRight_params.y = 0;
+        downRight_params.width = viewLeftWidth;
+        downRight_params.height = getDisplayHeight(windowManager)/4;
+
+        final GestureDetector myDownRightGesture = new GestureDetector(this,
+                new BrightnessGestureListener(this, windowManager, brightness, downRightCornerView));
+        downRightCornerView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getActionMasked() == MotionEvent.ACTION_DOWN)
+                    tv.setVisibility(View.VISIBLE);
+                else if(event.getActionMasked() == MotionEvent.ACTION_UP)
+                    tv.setVisibility(View.GONE);
+                return myDownRightGesture.onTouchEvent(event);
+            }
+        });
+        downRightCornerView.setClickable(true);
     }
 }

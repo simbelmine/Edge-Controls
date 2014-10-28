@@ -15,4 +15,8 @@ public class Variables {
     public static final String DOWNLEFTGONE = "/downleftgone";
     public static final String RIGHTVISIBLE = "/rightvisible";
     public static final String RIGHTGONE = "/rightgone";
+    public static final String UPRIGHTVISIBLE = "/uprightvisible";
+    public static final String UPRIGHTGONE = "/uprightgone";
+    public static final String DOWNRIGHTVISIBLE = "/downrightvisible";
+    public static final String DOWNRIGHTGONE = "/downrightgone";
 }
