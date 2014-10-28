@@ -349,7 +349,7 @@ public class FloatingService extends Service {
         ////////// *** Right MIDDLE View *** //////////
         //////////////////////////////////////////////
         rightView = new CustomView(this, tv);
-        rightView.setBackgroundColor(getResources().getColor(R.color.light_blue));
+//        rightView.setBackgroundColor(getResources().getColor(R.color.light_blue));
         right_params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT,
@@ -384,7 +384,7 @@ public class FloatingService extends Service {
         ////////// *** Right Up View *** //////////
         //////////////////////////////////////////////
         upRightCornerView = new CustomView(this, tv);
-        upRightCornerView.setBackgroundColor(getResources().getColor(R.color.light_blue));
+//        upRightCornerView.setBackgroundColor(getResources().getColor(R.color.light_blue));
         upRight_params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT,
@@ -397,7 +397,7 @@ public class FloatingService extends Service {
         upRight_params.gravity = Gravity.RIGHT | Gravity.TOP;
         upRight_params.x = 0;
         upRight_params.y = 0;
-        upRight_params.width = viewLeftWidth;
+        upRight_params.width = viewRightWidth;
         upRight_params.height = getDisplayHeight(windowManager)/4;
 
         final GestureDetector myUpRightGesture = new GestureDetector(this,
@@ -421,7 +421,7 @@ public class FloatingService extends Service {
         //////////////////////////////////////////////
 
         downRightCornerView = new CustomView(this, tv);
-        downRightCornerView.setBackgroundColor(getResources().getColor(R.color.light_blue));
+//        downRightCornerView.setBackgroundColor(getResources().getColor(R.color.light_blue));
         downRight_params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT,
@@ -434,7 +434,7 @@ public class FloatingService extends Service {
         downRight_params.gravity = Gravity.RIGHT | Gravity.BOTTOM;
         downRight_params.x = 0;
         downRight_params.y = 0;
-        downRight_params.width = viewLeftWidth;
+        downRight_params.width = viewRightWidth;
         downRight_params.height = getDisplayHeight(windowManager)/4;
 
         final GestureDetector myDownRightGesture = new GestureDetector(this,
