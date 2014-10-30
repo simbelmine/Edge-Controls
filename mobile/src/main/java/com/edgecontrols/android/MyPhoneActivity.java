@@ -50,6 +50,8 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
 
     private Object lock = new Object();
 
+    private BroadcastReceiver startReceiver;
+
     private class StarterThread extends Thread {
         @Override
         public void run() {
@@ -159,7 +161,7 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
     private void registerStartedBroadcastReceiver() {
         IntentFilter filter = new IntentFilter("com.edgecontrols.receiver.STARTED");
 
-        BroadcastReceiver receiver = new BroadcastReceiver() {
+        startReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 Log.v(tag, "phone sent STARTED");
@@ -167,7 +169,7 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
                 initializeViews();
             }
         };
-        registerReceiver(receiver, filter);
+        registerReceiver(startReceiver, filter);
     }
 
     private void registerStoppedBroadcastReceiver() {
@@ -228,9 +230,9 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
     @Override
     protected void onPause() {
         Log.e(tag, "onPAUSE .........");
-        super.onPause();
-
+        unregisterReceiver(startReceiver);
         stopThread = true;
+        super.onPause();
     }
 
     @Override
