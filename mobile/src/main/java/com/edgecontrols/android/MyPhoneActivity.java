@@ -348,21 +348,23 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
     }
 
     private void updateStartStopButtons() {
-        if (!serviceStarted || isStopPressed) {
-            if (!stopThread) {
+        if(startBtn != null && stopBtn != null) {
+            if (!serviceStarted || isStopPressed) {
+                if (!stopThread) {
+                    startBtn.setEnabled(false);
+                    startBtn.setText("Starting...");
+                } else {
+                    startBtn.setEnabled(true);
+                    startBtn.setBackground(getResources().getDrawable(R.drawable.button_style_up));
+                }
+                stopBtn.setEnabled(false);
+                stopBtn.setTextColor(getResources().getColor(R.color.gray));
+            } else if (!isStopPressed) {
                 startBtn.setEnabled(false);
-                startBtn.setText("Starting...");
-            } else {
-                startBtn.setEnabled(true);
-                startBtn.setBackground(getResources().getDrawable(R.drawable.button_style_up));
+                startBtn.setTextColor(getResources().getColor(R.color.gray));
+                stopBtn.setEnabled(true);
+                stopBtn.setBackground(getResources().getDrawable(R.drawable.button_style_up));
             }
-            stopBtn.setEnabled(false);
-            stopBtn.setTextColor(getResources().getColor(R.color.gray));
-        } else if(!isStopPressed){
-            startBtn.setEnabled(false);
-            startBtn.setTextColor(getResources().getColor(R.color.gray));
-            stopBtn.setEnabled(true);
-            stopBtn.setBackground(getResources().getDrawable(R.drawable.button_style_up));
         }
     }
 
