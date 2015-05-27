@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.example.sve.module.Variables;
 import com.google.android.gms.wearable.MessageEvent;
+import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.WearableListenerService;
 
 import java.util.HashSet;
@@ -75,15 +76,22 @@ public class StartUpNotificationListenerService extends WearableListenerService 
 
         if (messagePath.equals(Variables.START)) {
             Log.e(tag, "*********************** START (on WEAR) *****************************");
-            startService(serviceIntent);
             new SendMessageToPhoneHelper(this, "STARTED");
             isStarted = true;
             saveFlagToPreferences();
         }
         else if (messagePath.equals(Variables.STOP)) {
-            stopService(serviceIntent);
+            new SendMessageToPhoneHelper(this, "STOPPED");
             isStarted = false;
             saveFlagToPreferences();
+        }
+        else if(messagePath.equals(Variables.CHECK_STATUS)) {
+            if(sharedPreferences.getBoolean("serviceOn", false)) {
+                new SendMessageToPhoneHelper(this, "STARTED");
+            }
+            else {
+                new SendMessageToPhoneHelper(this, "STOPPED");
+            }
         }
         else {
             edgeStatus = getEdgeStatusIfCompatible(messagePath);

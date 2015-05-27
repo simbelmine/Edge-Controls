@@ -43,10 +43,12 @@ public class SendMessageToPhoneHelper {
 
     private void sendMessageOnWearableConnected(final String variable) {
         connectedNodes = new ArrayList<Node>();
+
         Wearable.NodeApi.getConnectedNodes(googleApiClient).setResultCallback(new ResultCallback<NodeApi.GetConnectedNodesResult>() {
             @Override
             public void onResult(NodeApi.GetConnectedNodesResult getConnectedNodesResult) {
                 boolean isWearableConnected = isWearableConnected(getConnectedNodesResult);
+
                 if (isWearableConnected) {
                     nodeId = getConnectedNodesResult.getNodes().get(0).getId();
 
@@ -55,11 +57,23 @@ public class SendMessageToPhoneHelper {
                     editor.putString("nodeId", nodeId);
                     editor.commit();
 
+                    serviceAction(variable);
                     sendMessageToPhone(variable);
+                } else {
+                    serviceAction(variable);
                 }
                 googleApiClient.disconnect();
             }
         });
+    }
+
+    private void serviceAction(String variable) {
+        if("STARTED".equals(variable)) {
+            context.startService(new Intent(context, FloatingService.class));
+        }
+        else if("STOPPED".equals(variable)) {
+            context.stopService(new Intent(context, FloatingService.class));
+        }
     }
 
     private void sendMessageToPhone(final String variable) {

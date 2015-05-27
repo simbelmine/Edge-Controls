@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.sve.edgecontrols.R;
 import com.example.sve.module.Variables;
@@ -33,6 +34,7 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
     private Button settings;
     private Button startBtn;
     private Button stopBtn;
+    private TextView sinchronize;
     private ImageView imageView;
 
     public static final String tag = "edgecontrols.brightness";
@@ -51,13 +53,13 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
     private Object lock = new Object();
 
     private BroadcastReceiver startReceiver;
+    private BroadcastReceiver checkStatusReceiver;
+    private BroadcastReceiver stopReceiver;
 
     private class StarterThread extends Thread {
         @Override
         public void run() {
             super.run();
-
-
 
             if (!connected) {
                 Log.v(tag, "thread waits for connection!");
@@ -176,7 +178,7 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
     private void registerStoppedBroadcastReceiver() {
         IntentFilter filter = new IntentFilter("com.edgecontrols.receiver.STOPPED");
 
-        BroadcastReceiver receiver = new BroadcastReceiver() {
+        stopReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 Log.v(tag, "phone sent STOPPED");
@@ -185,7 +187,19 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
                 initializeViews();
             }
         };
-        registerReceiver(receiver, filter);
+        registerReceiver(stopReceiver, filter);
+    }
+
+    private void registerCheckStatusBroadcastReceiver() {
+        IntentFilter filter = new IntentFilter("com.edgecontrols.receiver.CHECK_STATUS");
+
+        checkStatusReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.v(tag, "phone sent CHECK_STATUS");
+            }
+        };
+        registerReceiver(checkStatusReceiver, filter);
     }
 
     private boolean isServiceStarted() {
@@ -202,6 +216,9 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
     @Override
     protected void onResume() {
         Log.e(tag, "onResume .........");
+        registerStartedBroadcastReceiver();
+        registerStoppedBroadcastReceiver();
+        registerCheckStatusBroadcastReceiver();
         super.onResume();
     }
 
@@ -209,8 +226,9 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
     public void onConnected(Bundle bundle) {
         Log.e(tag, "onConnected ....");
 
-        registerStartedBroadcastReceiver();
-        registerStoppedBroadcastReceiver();
+//        registerStartedBroadcastReceiver();
+//        registerStoppedBroadcastReceiver();
+//        registerCheckStatusBroadcastReceiver();
 
         new Thread() {
             @Override
@@ -231,9 +249,21 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
     }
 
     @Override
+    public void onConnectionSuspended(int i) {
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Log.e(tag, "onConnectionFailed....");
+        showWearableNotConnected();
+    }
+
+    @Override
     protected void onPause() {
         Log.e(tag, "onPAUSE .........");
         unregisterReceiver(startReceiver);
+        unregisterReceiver(stopReceiver);
+        unregisterReceiver(checkStatusReceiver);
         stopThread = true;
         super.onPause();
     }
@@ -259,7 +289,7 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
         editor.putBoolean("stopThread", stopThread);
         editor.commit();
 
-        Log.e(tag, "******** onCreate ******* connected = " + sharedPreferences.getBoolean("connected",connected));
+        Log.e(tag, "******** onCreate ******* connected = " + sharedPreferences.getBoolean("connected", connected));
         Log.e(tag, "******** onCreate ******* serviceStarted = " + sharedPreferences.getBoolean("serviceStarted", serviceStarted));
     }
 
@@ -315,6 +345,14 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
             @Override
             public void onClick(View v) {
                startSettingsActivity();
+            }
+        });
+
+        sinchronize = (TextView) findViewById(R.id.synchronize);
+        sinchronize.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendMessageToWear(Variables.CHECK_STATUS);
             }
         });
 
@@ -408,7 +446,21 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
                     if(Variables.STOP.equals(variable)) {
                         isStopPressed = true;
                     }
+                    if(Variables.CHECK_STATUS.equals(variable)) {
+                        this.runOnUiThread(new Runnable() {
+                            public void run() {
+                                Toast.makeText(getApplicationContext(), getResources().getString(R.string.synchronize_success), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
                 } else {
+                    if (Variables.CHECK_STATUS.equals(variable)) {
+                        this.runOnUiThread(new Runnable() {
+                            public void run() {
+                                Toast.makeText(getApplicationContext(), getResources().getString(R.string.synchronize_failed), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
                     Log.e(tag, "Failed to send the Message: " + variable);
                 }
                 //mGoogleApiClient.disconnect();
@@ -432,16 +484,5 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
             return true;
         }
         return false;
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        Log.e(tag, "onConnectionFailed....");
-        showWearableNotConnected();
     }
 }

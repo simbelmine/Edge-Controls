@@ -4,4 +4,8 @@
     <string name="main_text">If it\'s not started, click <font size='20' fgcolor='teal'><b>Start</b></font> and the application will be ready to use on your wear device!</string>
     <string name="no_devie_connected">No device connected. Please connect your Wear or open the wear app using the Start menu.</string>
     <string name="transparent_msg"><font size='20' fgcolor='teal'><b><u>NB</u></b></font>: The image above it\'s just an example. The lines in the application are <font fgcolor='teal'><b>transparent</b></font>. You just need to swipe up-down to change the brightness level.</string>
+    <string name="synchronize"><u>Synchronize with watch</u></string>
+    <string name="synchronize_success">Synchronized with watch</string>
+    <string name="synchronize_failed">Cannot synchronize with watch</string>
+
 </resources>
