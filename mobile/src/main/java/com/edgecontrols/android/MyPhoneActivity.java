@@ -166,6 +166,7 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
             public void onReceive(Context context, Intent intent) {
                 Log.v(tag, "phone sent STARTED");
                 serviceStarted = true;
+                isStopPressed = false;
                 initializeViews();
             }
         };
@@ -180,7 +181,8 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
             public void onReceive(Context context, Intent intent) {
                 Log.v(tag, "phone sent STOPPED");
                 serviceStarted = false;
-                updateStartStopButtons();
+                isStopPressed = true;
+                initializeViews();
             }
         };
         registerReceiver(receiver, filter);
@@ -208,6 +210,7 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
         Log.e(tag, "onConnected ....");
 
         registerStartedBroadcastReceiver();
+        registerStoppedBroadcastReceiver();
 
         new Thread() {
             @Override
@@ -257,7 +260,7 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
         editor.commit();
 
         Log.e(tag, "******** onCreate ******* connected = " + sharedPreferences.getBoolean("connected",connected));
-        Log.e(tag, "******** onCreate ******* serviceStarted = " + sharedPreferences.getBoolean("serviceStarted",serviceStarted));
+        Log.e(tag, "******** onCreate ******* serviceStarted = " + sharedPreferences.getBoolean("serviceStarted", serviceStarted));
     }
 
     private void saveNodes() {
@@ -357,9 +360,11 @@ public class MyPhoneActivity extends Activity implements GoogleApiClient.Connect
                     startBtn.setEnabled(true);
                     startBtn.setBackground(getResources().getDrawable(R.drawable.button_style_up));
                 }
+
                 stopBtn.setEnabled(false);
                 stopBtn.setTextColor(getResources().getColor(R.color.gray));
-            } else if (!isStopPressed) {
+            }
+            else if (!isStopPressed) {
                 startBtn.setEnabled(false);
                 startBtn.setTextColor(getResources().getColor(R.color.gray));
                 stopBtn.setEnabled(true);

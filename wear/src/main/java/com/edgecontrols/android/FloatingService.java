@@ -16,6 +16,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.example.sve.edgecontrols.R;
@@ -79,6 +80,11 @@ public class FloatingService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         SharedPreferences sharedPreferences = getSharedPreferences(wearPrefs, 0);
         edgesStatusSet = sharedPreferences.getStringSet("edgeStatusList", null);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("serviceOn", true);
+        editor.commit();
+        Toast.makeText(this, "Brightness Control is ON", Toast.LENGTH_SHORT).show();
+
 
         if (edgesStatusSet != null) {
             edgeVisibilityParam = getStatusFromExtras(intent);
@@ -218,7 +224,11 @@ public class FloatingService extends Service {
         if(upRightCornerView != null) windowManager.removeViewImmediate(upRightCornerView);
         if(downRightCornerView != null) windowManager.removeViewImmediate(downRightCornerView);
 
-        //Toast.makeText(this, "Destroy ...", Toast.LENGTH_LONG).show();
+        SharedPreferences sharedPreferences = getSharedPreferences(wearPrefs, 0);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("serviceOn", false);
+        editor.commit();
+        Toast.makeText(this, "Brightness Control is OFF", Toast.LENGTH_SHORT).show();
         stopSelf();
         super.onDestroy();
     }
