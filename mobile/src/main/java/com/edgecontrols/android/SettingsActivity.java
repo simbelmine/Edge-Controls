@@ -63,10 +63,10 @@ public class SettingsActivity extends Activity {
     private void updateFlagsFromPreferences() {
         SharedPreferences sharedPrefs = getSharedPreferences(mobilePrefs, 0);
         upLeft_clicked = sharedPrefs.getBoolean("upLeft_clicked", true);
-        middleLeft_clicked = sharedPrefs.getBoolean("middleLeft_clicked", true);
+        middleLeft_clicked = sharedPrefs.getBoolean("middleLeft_clicked", false);
         downLeft_clicked = sharedPrefs.getBoolean("downLeft_clicked", true);
         upRight_clicked = sharedPrefs.getBoolean("upRight_clicked", true);
-        right_clicked = sharedPrefs.getBoolean("right_clicked", false);
+        right_clicked = sharedPrefs.getBoolean("right_clicked", true);
         downRight_clicked = sharedPrefs.getBoolean("downRight_clicked", true);
     }
 

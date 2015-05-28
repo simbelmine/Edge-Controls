@@ -135,10 +135,10 @@ public class FloatingService extends Service {
         Log.e("TAG", "************** INITIAL ***************");
 
         boolean upLeft = localSharedPrefs.getBoolean("upLeft", false);
-        boolean middleLeft = localSharedPrefs.getBoolean("middleLeft", false);
+        boolean middleLeft = localSharedPrefs.getBoolean("middleLeft", true);
         boolean downLeft = localSharedPrefs.getBoolean("downLeft", false);
         boolean upRight = localSharedPrefs.getBoolean("upRight", false);
-        boolean right = localSharedPrefs.getBoolean("right", true);
+        boolean right = localSharedPrefs.getBoolean("right", false);
         boolean downRight = localSharedPrefs.getBoolean("downRight", false);
 
         changeViewVisibility(upLeft, upLeftCornerView);
