@@ -101,15 +101,21 @@ public class FloatingService extends Service {
         }
 
         if (!viewsAddedToWM) {
-            windowManager.addView(tv, paramsTextView);
-            windowManager.addView(middleLeftView, left_params);
-            windowManager.addView(upLeftCornerView, upLeft_params);
-            windowManager.addView(downLeftCornerView, downLeft_params);
-            windowManager.addView(rightView, right_params);
-            windowManager.addView(upRightCornerView, upRight_params);
-            windowManager.addView(downRightCornerView, downRight_params);
+            try {
+                windowManager.addView(tv, paramsTextView);
+                windowManager.addView(middleLeftView, left_params);
+                windowManager.addView(upLeftCornerView, upLeft_params);
+                windowManager.addView(downLeftCornerView, downLeft_params);
+                windowManager.addView(rightView, right_params);
+                windowManager.addView(upRightCornerView, upRight_params);
+                windowManager.addView(downRightCornerView, downRight_params);
 
-            viewsAddedToWM = true;
+                viewsAddedToWM = true;
+            }
+            catch (Exception ex) {
+                Log.e(tag, "###---onStartCommand--####: " + ex.getStackTrace());
+            }
+
         }
 
         return Service.START_NOT_STICKY;
@@ -216,13 +222,18 @@ public class FloatingService extends Service {
     @Override
     public void onDestroy() {
 
-        if(tv != null) windowManager.removeViewImmediate(tv);
-        if(middleLeftView != null) windowManager.removeViewImmediate(middleLeftView);
-        if(upLeftCornerView != null) windowManager.removeViewImmediate(upLeftCornerView);
-        if(downLeftCornerView != null) windowManager.removeViewImmediate(downLeftCornerView);
-        if(rightView != null) windowManager.removeViewImmediate(rightView);
-        if(upRightCornerView != null) windowManager.removeViewImmediate(upRightCornerView);
-        if(downRightCornerView != null) windowManager.removeViewImmediate(downRightCornerView);
+        try {
+            if (tv != null) windowManager.removeViewImmediate(tv);
+            if (middleLeftView != null) windowManager.removeViewImmediate(middleLeftView);
+            if (upLeftCornerView != null) windowManager.removeViewImmediate(upLeftCornerView);
+            if (downLeftCornerView != null) windowManager.removeViewImmediate(downLeftCornerView);
+            if (rightView != null) windowManager.removeViewImmediate(rightView);
+            if (upRightCornerView != null) windowManager.removeViewImmediate(upRightCornerView);
+            if (downRightCornerView != null) windowManager.removeViewImmediate(downRightCornerView);
+        }
+        catch (Exception ex) {
+            Log.e(tag, "###---onDestroy--####: " + ex.getStackTrace());
+        }
 
         SharedPreferences sharedPreferences = getSharedPreferences(wearPrefs, 0);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -244,8 +255,9 @@ public class FloatingService extends Service {
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSLUCENT
         );
-        tv.setLayoutParams(paramsTextView);
+
         paramsTextView.gravity = Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL;
+        tv.setLayoutParams(paramsTextView);
         tv.setVisibility(View.GONE);
         tv.setTypeface(Typeface.DEFAULT_BOLD);
 
@@ -257,13 +269,15 @@ public class FloatingService extends Service {
         //middleLeftView.setBackgroundColor(getResources().getColor(R.color.light_blue));
         left_params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.TYPE_PHONE,
-                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
-                WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-                PixelFormat.TRANSLUCENT
+                WindowManager.LayoutParams.WRAP_CONTENT
         );
+        left_params.type = WindowManager.LayoutParams.TYPE_PHONE;
+        left_params.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
+        left_params.flags = WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH;
+        left_params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+        left_params.format = PixelFormat.TRANSLUCENT;
+
+
         left_params.gravity = Gravity.LEFT | Gravity.CENTER_HORIZONTAL;
         left_params.x = 0;
         left_params.y = 0;
@@ -292,13 +306,16 @@ public class FloatingService extends Service {
         //upLeftCornerView.setBackgroundColor(getResources().getColor(R.color.light_blue));
         upLeft_params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.TYPE_PHONE,
-                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
-                WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-                PixelFormat.TRANSLUCENT
+                WindowManager.LayoutParams.WRAP_CONTENT
         );
+        upLeft_params.type = WindowManager.LayoutParams.TYPE_PHONE;
+        upLeft_params.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
+        upLeft_params.flags = WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH;
+        upLeft_params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+        upLeft_params.format = PixelFormat.TRANSLUCENT;
+
+
+
         upLeft_params.gravity = Gravity.LEFT | Gravity.TOP;
         upLeft_params.x = 0;
         upLeft_params.y = 0;
@@ -327,13 +344,16 @@ public class FloatingService extends Service {
         //downLeftCornerView.setBackgroundColor(getResources().getColor(R.color.light_blue));
         downLeft_params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.TYPE_PHONE,
-                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
-                WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-                PixelFormat.TRANSLUCENT
+                WindowManager.LayoutParams.WRAP_CONTENT
         );
+        downLeft_params.type = WindowManager.LayoutParams.TYPE_PHONE;
+        downLeft_params.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
+        downLeft_params.flags = WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH;
+        downLeft_params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+        downLeft_params.format = PixelFormat.TRANSLUCENT;
+
+
+
         downLeft_params.gravity = Gravity.LEFT | Gravity.BOTTOM;
         downLeft_params.x = 0;
         downLeft_params.y = 0;
@@ -362,13 +382,15 @@ public class FloatingService extends Service {
 //        rightView.setBackgroundColor(getResources().getColor(R.color.light_blue));
         right_params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.TYPE_PHONE,
-                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
-                WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-                PixelFormat.TRANSLUCENT
+                WindowManager.LayoutParams.WRAP_CONTENT
         );
+        right_params.type = WindowManager.LayoutParams.TYPE_PHONE;
+        right_params.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
+        right_params.flags = WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH;
+        right_params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+        right_params.format = PixelFormat.TRANSLUCENT;
+
+
         right_params.gravity = Gravity.RIGHT | Gravity.CENTER_HORIZONTAL;
         right_params.x = 0;
         right_params.y = 0;
@@ -380,10 +402,12 @@ public class FloatingService extends Service {
         rightView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if(event.getActionMasked() == MotionEvent.ACTION_DOWN)
+                if(event.getActionMasked() == MotionEvent.ACTION_DOWN) {
                     tv.setVisibility(View.VISIBLE);
-                else if(event.getActionMasked() == MotionEvent.ACTION_UP)
+                }
+                else if(event.getActionMasked() == MotionEvent.ACTION_UP) {
                     tv.setVisibility(View.GONE);
+                }
                 return myRightGesture.onTouchEvent(event);
             }
         });
@@ -397,13 +421,16 @@ public class FloatingService extends Service {
 //        upRightCornerView.setBackgroundColor(getResources().getColor(R.color.light_blue));
         upRight_params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.TYPE_PHONE,
-                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
-                WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-                PixelFormat.TRANSLUCENT
+                WindowManager.LayoutParams.WRAP_CONTENT
         );
+        upRight_params.type = WindowManager.LayoutParams.TYPE_PHONE;
+        upRight_params.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
+        upRight_params.flags = WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH;
+        upRight_params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+        upRight_params.format = PixelFormat.TRANSLUCENT;
+
+
+
         upRight_params.gravity = Gravity.RIGHT | Gravity.TOP;
         upRight_params.x = 0;
         upRight_params.y = 0;
@@ -434,13 +461,16 @@ public class FloatingService extends Service {
 //        downRightCornerView.setBackgroundColor(getResources().getColor(R.color.light_blue));
         downRight_params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.TYPE_PHONE,
-                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
-                WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-                PixelFormat.TRANSLUCENT
+                WindowManager.LayoutParams.WRAP_CONTENT
         );
+        downRight_params.type = WindowManager.LayoutParams.TYPE_PHONE;
+        downRight_params.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
+        downRight_params.flags = WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH;
+        downRight_params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+        downRight_params.format = PixelFormat.TRANSLUCENT;
+
+
+
         downRight_params.gravity = Gravity.RIGHT | Gravity.BOTTOM;
         downRight_params.x = 0;
         downRight_params.y = 0;

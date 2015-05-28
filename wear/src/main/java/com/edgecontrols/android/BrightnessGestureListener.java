@@ -13,6 +13,7 @@ import android.view.WindowManager;
  * Created by Sve on 10/3/14.
  */
 public class BrightnessGestureListener implements GestureDetector.OnGestureListener {
+    private static final String tag = "edge.brightness.wearable.listener";
     Context cntx;
     WindowManager windowManager;
     CustomView view;
@@ -36,6 +37,7 @@ public class BrightnessGestureListener implements GestureDetector.OnGestureListe
 
     @Override
     public boolean onDown(MotionEvent e) {
+        Log.v(tag, "###--- onDown() ---###");
         initialBrightness = brightness;
         initialY = e.getY();
         return false;
@@ -48,12 +50,14 @@ public class BrightnessGestureListener implements GestureDetector.OnGestureListe
 
     @Override
     public void onLongPress(MotionEvent e) {
+        Log.v(tag, "###--- onLongPress() ---###");
         putAutoBrightness();
         view.indicator.setText("Auto Mode");
     }
 
     @Override
     public boolean onScroll(MotionEvent firstEvent, MotionEvent currentEvent, float distanceX, float distanceY) {
+        Log.v(tag, "###--- onScroll() ---###");
         float e2Y = currentEvent.getY();
         float distY = Math.round(e2Y - initialY);
 
