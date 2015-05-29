@@ -9,8 +9,8 @@ android {
         applicationId "com.edgecontrols.android"
         minSdkVersion 20
         targetSdkVersion 20
-        versionCode 14
-        versionName "1.4"
+        versionCode 15
+        versionName "1.5"
     }
 
     signingConfigs {
