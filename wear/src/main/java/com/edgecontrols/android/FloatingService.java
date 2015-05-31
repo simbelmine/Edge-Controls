@@ -118,7 +118,7 @@ public class FloatingService extends Service {
 
         }
 
-        return Service.START_NOT_STICKY;
+        return Service.START_REDELIVER_INTENT;
     }
 
     private String getStatusFromExtras(Intent intent) {
