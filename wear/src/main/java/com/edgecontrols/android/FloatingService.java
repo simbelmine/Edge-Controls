@@ -261,6 +261,9 @@ public class FloatingService extends Service {
         tv.setVisibility(View.GONE);
         tv.setTypeface(Typeface.DEFAULT_BOLD);
 
+        tv.setTextColor(getResources().getColor(R.color.white));
+        tv.setShadowLayer(1, 0.5f, 0.5f, getResources().getColor(R.color.black));
+
 
         //////////////////////////////////////////////
         ////////// *** Left Middle View *** //////////
