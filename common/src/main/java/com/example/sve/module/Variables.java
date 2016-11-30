@@ -7,6 +7,8 @@ public class Variables {
     public static final String START = "/start";
     public static final String STOP = "/stop";
     public static final String CHECK_STATUS = "/check_status";
+    public static final String STARTED = "/started";
+    public static final String STOPPED = "/stopped";
 
     public static final String UPLEFTVISIBLE = "/upleftvisible";
     public static final String UPLEFTGONE = "/upleftgone";

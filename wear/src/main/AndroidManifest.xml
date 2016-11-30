@@ -45,7 +45,11 @@
             android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
 
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
+                <data android:scheme="wear" android:host="*" android:path="/start" />
+                <data android:scheme="wear" android:host="*" android:path="/stop" />
+                <data android:scheme="wear" android:host="*" android:path="/check_status" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>

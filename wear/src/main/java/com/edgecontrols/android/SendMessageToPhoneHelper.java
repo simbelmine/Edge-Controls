@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import com.example.sve.module.Variables;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
@@ -68,10 +69,10 @@ public class SendMessageToPhoneHelper {
     }
 
     private void serviceAction(String variable) {
-        if("STARTED".equals(variable)) {
+        if(Variables.STARTED.equals(variable)) {
             context.startService(new Intent(context, FloatingService.class));
         }
-        else if("STOPPED".equals(variable)) {
+        else if(Variables.STOPPED.equals(variable)) {
             context.stopService(new Intent(context, FloatingService.class));
         }
     }

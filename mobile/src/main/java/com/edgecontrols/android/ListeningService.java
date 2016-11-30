@@ -20,14 +20,14 @@ public class ListeningService extends WearableListenerService {
     public void onMessageReceived(MessageEvent messageEvent) {
         String messagePath = messageEvent.getPath();
 
-        if ("STARTED".equals(messagePath)) {
+        if (Variables.STARTED.equals(messagePath)) {
             Intent intent = new Intent();
             intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
             intent.setAction("com.edgecontrols.receiver.STARTED");
             sendBroadcast(intent);
             Log.e(tag, "####### STARTED it's RECEIVED....");
         }
-        if ("STOPPED".equals(messagePath)) {
+        if (Variables.STOPPED.equals(messagePath)) {
             Intent intent = new Intent();
             intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
             intent.setAction("com.edgecontrols.receiver.STOPPED");

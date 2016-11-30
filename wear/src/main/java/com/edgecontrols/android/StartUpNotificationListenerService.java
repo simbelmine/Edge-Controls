@@ -76,21 +76,21 @@ public class StartUpNotificationListenerService extends WearableListenerService 
 
         if (messagePath.equals(Variables.START)) {
             Log.e(tag, "*********************** START (on WEAR) *****************************");
-            new SendMessageToPhoneHelper(this, "STARTED");
+            new SendMessageToPhoneHelper(this, Variables.STARTED);
             isStarted = true;
             saveFlagToPreferences();
         }
         else if (messagePath.equals(Variables.STOP)) {
-            new SendMessageToPhoneHelper(this, "STOPPED");
+            new SendMessageToPhoneHelper(this, Variables.STOPPED);
             isStarted = false;
             saveFlagToPreferences();
         }
         else if(messagePath.equals(Variables.CHECK_STATUS)) {
             if(sharedPreferences.getBoolean("serviceOn", false)) {
-                new SendMessageToPhoneHelper(this, "STARTED");
+                new SendMessageToPhoneHelper(this, Variables.STARTED);
             }
             else {
-                new SendMessageToPhoneHelper(this, "STOPPED");
+                new SendMessageToPhoneHelper(this, Variables.STOPPED);
             }
         }
         else {
