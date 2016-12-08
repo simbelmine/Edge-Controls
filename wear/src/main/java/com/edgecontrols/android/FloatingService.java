@@ -50,6 +50,7 @@ public class FloatingService extends Service {
     private Set<String> edgesStatusSet;
     private String edgeVisibilityParam;
     private SharedPreferences localSharedPrefs;
+    private SharedPreferences wearSharedPreferences;
     private String localPrefs = "MyLocalPrefs";
     private String wearPrefs = "MyWearPrefs";
     private Context context;
@@ -70,17 +71,21 @@ public class FloatingService extends Service {
 
         context = getApplicationContext();
         localSharedPrefs = context.getSharedPreferences(localPrefs, 0);
+        wearSharedPreferences = getSharedPreferences(wearPrefs, 0);
 
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
+
+        brightness = wearSharedPreferences.getFloat("brightness", 0);
+
+        Log.v(tag, "*** brightness = " + brightness);
 
         initializeViews();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        SharedPreferences sharedPreferences = getSharedPreferences(wearPrefs, 0);
-        edgesStatusSet = sharedPreferences.getStringSet("edgeStatusList", null);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
+        edgesStatusSet = wearSharedPreferences.getStringSet("edgeStatusList", null);
+        SharedPreferences.Editor editor = wearSharedPreferences.edit();
         editor.putBoolean("serviceOn", true);
         editor.commit();
         Toast.makeText(this, "Brightness Control is ON", Toast.LENGTH_SHORT).show();
@@ -235,8 +240,7 @@ public class FloatingService extends Service {
             Log.e(tag, "###---onDestroy--####: " + ex.getStackTrace());
         }
 
-        SharedPreferences sharedPreferences = getSharedPreferences(wearPrefs, 0);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
+        SharedPreferences.Editor editor = wearSharedPreferences.edit();
         editor.putBoolean("serviceOn", false);
         editor.commit();
         Toast.makeText(this, "Brightness Control is OFF", Toast.LENGTH_SHORT).show();

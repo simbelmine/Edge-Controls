@@ -1,6 +1,7 @@
 package com.edgecontrols.android;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.provider.Settings;
 import android.util.Log;
@@ -33,6 +34,8 @@ public class BrightnessGestureListener implements GestureDetector.OnGestureListe
         this.view = view;
         viewHeight = getDisplayHeight(windowManager);
         MIN_DIST = viewHeight / 10;
+
+        view.setBrightness(this.brightness);
     }
 
     @Override
@@ -78,6 +81,7 @@ public class BrightnessGestureListener implements GestureDetector.OnGestureListe
             putManualBrightness();
             setDisplayBrightness(brightness);
             showBrightnessMsg("", brightness);
+            saveBrightnessState(brightness);
         }
         return true;
     }
@@ -137,6 +141,12 @@ public class BrightnessGestureListener implements GestureDetector.OnGestureListe
     private void showBrightnessMsg(String s, float brightness) {
         view.indicator.setText(((int)brightness) + "%");
     }
+
+    private void saveBrightnessState(float brightness) {
+        SharedPreferences sharedPreferences = cntx.getSharedPreferences("MyWearPrefs", 0);
+        sharedPreferences.edit().putFloat("brightness", brightness).commit();
+    }
+
 
     private void printLog(boolean isGoingUp, float distY, float distY_diff, int MIN_DIST, float brightness) {
         if(isGoingUp)
