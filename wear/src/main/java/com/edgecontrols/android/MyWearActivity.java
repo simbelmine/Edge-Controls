@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import com.example.sve.module.Variables;
 import com.google.android.gms.common.api.GoogleApiClient;
 
 public class MyWearActivity extends Activity {
@@ -24,11 +25,23 @@ public class MyWearActivity extends Activity {
     }
 
     private void serviceAction() {
+        boolean isStarted;
         if(!wearSharedPreferences.getBoolean("serviceOn", false)) {
-            new SendMessageToPhoneHelper(this, "STARTED");
+            isStarted = true;
+            saveFlagToPreferences(isStarted);
+            new SendMessageToPhoneHelper(this, Variables.STARTED);
         }
         else {
-            new SendMessageToPhoneHelper(this, "STOPPED");
+            isStarted = false;
+            saveFlagToPreferences(isStarted);
+            new SendMessageToPhoneHelper(this, Variables.STOPPED);
         }
+    }
+
+    private void saveFlagToPreferences(boolean isStarted) {
+        SharedPreferences wearSharedPreferences= getSharedPreferences(wearPrefs, 0);
+        SharedPreferences.Editor editor = wearSharedPreferences.edit();
+        editor.putBoolean("isStarted", isStarted);
+        editor.commit();
     }
 }

@@ -18,6 +18,8 @@ public class BootUpReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         isStarted = getFlagFromSharedPreferences(context);
+        Log.d(tag, "Flag: isStarted = " + isStarted);
+
         if(isStarted) {
             Intent serviceIntent = new Intent(context, FloatingService.class);
             context.startService(serviceIntent);

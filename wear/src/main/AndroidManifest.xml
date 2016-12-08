@@ -37,18 +37,24 @@
             android:enabled="true"
             android:exported="true">
             <intent-filter>
-                <action android:name="com.google.android.gms.wearable.BIND_LISTENER" />
-            </intent-filter>
-        </service>
-
-        <receiver android:enabled="true" android:name="com.edgecontrols.android.BootUpReceiver"
-            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
-
-            <intent-filter>
+                <!--<action android:name="com.google.android.gms.wearable.BIND_LISTENER" />-->
                 <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
                 <data android:scheme="wear" android:host="*" android:path="/start" />
                 <data android:scheme="wear" android:host="*" android:path="/stop" />
+                <data android:scheme="wear" android:host="*" android:path="/started" />
+                <data android:scheme="wear" android:host="*" android:path="/stopped" />
                 <data android:scheme="wear" android:host="*" android:path="/check_status" />
+
+            </intent-filter>
+        </service>
+
+        <receiver
+            android:enabled="true"
+            android:name="com.edgecontrols.android.BootUpReceiver"
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
+
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
