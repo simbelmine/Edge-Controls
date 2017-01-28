@@ -1,4 +1,0 @@
-1. Change the version Code and Name in :mobile and :wear  build.gradle files
-2. Build -> Generate Signed APK 
-	(Default Password: android)
-3. Attach the mobile apk from this folder (not from the apk folder!)
